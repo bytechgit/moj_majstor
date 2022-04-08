@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:moj_majstor/Login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,19 +39,13 @@ class _MyHomePageState extends State<MyHomePage> {
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
-              child: Text(
-                'Drawer Header',
-                style: TextStyle(color: Colors.white),
-              ),
+              child: Text('Drawer Header'),
             ),
             ListTile(
-              title: const Text('Login'),
-              trailing: Icon(Icons.login),
+              title: const Text('Item 1'),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Login()),
-                );
+                // Update the state of the app.
+                // ...
               },
             ),
             ListTile(
