@@ -45,7 +45,7 @@ class _LoadingPageState extends State<LoadingPage> {
             Text(
               'Connection status: ${_connectivityResult.toString()}',
             ),
-            Image.asset('assets/img/logo.png'),
+            const Image(image: AssetImage('assets/img/logo.png'))
           ],
         ),
       ),
