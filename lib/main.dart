@@ -1,7 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:moj_majstor/Login.dart';
+import 'package:moj_majstor/proba.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'Authentication.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(ChangeNotifierProvider(
+      create: (context) => UserAuthentication(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -42,8 +54,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text('Drawer Header'),
             ),
             ListTile(
-              title: const Text('Item 1'),
+              title: const Text('Login'),
               onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const Login();
+                }));
                 // Update the state of the app.
                 // ...
               },
@@ -51,8 +66,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: const Text('Item 2'),
               onTap: () {
-                // Update the state of the app.
-                // ...
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const proba();
+                }));
               },
             ),
           ],
