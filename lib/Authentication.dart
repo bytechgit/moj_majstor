@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class UserAuthentication with ChangeNotifier {
   static final UserAuthentication _singleton = UserAuthentication._internal();
@@ -38,6 +39,10 @@ class UserAuthentication with ChangeNotifier {
     await _googleSignIn.signOut();
     await _auth.signOut();
     notifyListeners();
+  }
+
+  Future<void> signInwithFacebook() async {
+    final pom = await FacebookAuth.instance.login();
   }
 
   Future<String?> signInwithGoogle() async {
