@@ -1,11 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:moj_majstor/ForgotPassword.dart';
 import 'package:moj_majstor/SignUp.dart';
 import 'Authentication.dart';
-import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -16,17 +14,11 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   UserAuthentication ua = UserAuthentication();
-  UserAuthentication ua1 = UserAuthentication();
-  int _selectedIndex = 0;
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.orange,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -141,6 +133,8 @@ class _LoginState extends State<Login> {
                           text: 'FORGOT PASSWORD ?',
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
+                              print('aaaa');
+                              ua.Kategorije();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) {

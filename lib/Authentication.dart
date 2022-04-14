@@ -23,7 +23,7 @@ class UserAuthentication with ChangeNotifier {
   }
 
   final _auth = FirebaseAuth.instance;
-  //final firestore = FirebaseFirestore.instance;
+  final firestore = FirebaseFirestore.instance;
   //UserCredential? userCredential;
   CollectionReference users = FirebaseFirestore.instance.collection('Users');
   GoogleSignInAccount? _currentUser;
@@ -34,6 +34,13 @@ class UserAuthentication with ChangeNotifier {
       //'https://www.googleapis.com/auth/contacts.readonly',
     ],
   );
+  Future<void> Kategorije() async {
+    print('eee');
+    final kategorije = await firestore.collection('Kategorije').get();
+    for (var k in kategorije.docs) {
+      print(k.data());
+    }
+  }
 
   Future<void> signout() async {
     await _googleSignIn.signOut();

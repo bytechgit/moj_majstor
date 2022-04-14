@@ -11,24 +11,29 @@ class _SignUpUserState extends State<SignUpUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          color: Colors.orange,
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            children: [
-              Expanded(
-                child: Container(
-                  color: Colors.orange,
-                  child: Icon(
-                    Icons.supervised_user_circle,
-                    color: Colors.white,
-                    size: 100,
-                  ),
+      backgroundColor: Colors.white,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Color.fromRGBO(20, 33, 61, 1),
+            pinned: true,
+            expandedHeight: 200.0,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text('Registracija'),
+              background: Container(
+                color: Colors.orange,
+                child: const Icon(
+                  Icons.supervised_user_circle,
+                  color: Colors.white,
+                  size: 100,
                 ),
               ),
-              Container(
-                width: MediaQuery.of(context).size.width,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              color: Colors.orange,
+              child: Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -98,7 +103,7 @@ class _SignUpUserState extends State<SignUpUser> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 8, bottom: 8),
+                      padding: const EdgeInsets.only(top: 10, bottom: 10),
                       child: SizedBox(
                         height: 55,
                         width: MediaQuery.of(context).size.width * 0.85,
@@ -143,10 +148,10 @@ class _SignUpUserState extends State<SignUpUser> {
                     ),
                   ],
                 ),
-              )
-            ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

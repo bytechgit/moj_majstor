@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moj_majstor/SignUpMajstor.dart';
 import 'package:moj_majstor/SignUpUser.dart';
 
 class SignIn extends StatefulWidget {
@@ -49,9 +50,7 @@ class _SignInState extends State<SignIn> {
         controller: pageController,
         children: const <Widget>[
           SignUpUser(),
-          Center(
-            child: Text('Second Page'),
-          ),
+          SignUpMajstor(),
         ],
       ),
     );
