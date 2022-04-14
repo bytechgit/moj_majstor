@@ -35,7 +35,9 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(primarySwatch: Colors.blueGrey),
-        home: const InsertLocation(),
+        home: const MyHomePage(
+          title: 'Moj majstor',
+        ),
       ),
     );
   }
@@ -80,6 +82,14 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return const proba();
+                }));
+              },
+            ),
+            ListTile(
+              title: const Text('lokacija 2'),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const InsertLocation();
                 }));
               },
             ),
