@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:moj_majstor/InternetConnection.dart';
+import 'package:moj_majstor/Login.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);
@@ -12,41 +13,64 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-  ConnectivityResult? _connectivityResult;
-  late StreamSubscription _connectivitySubscription;
+  InternetConnection network = InternetConnection();
+
+  void LoadPage() {
+    network.testConnection();
+    if (InternetConnection.isDeviceConnected) {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) {
+        return const Login();
+      }), (Route<dynamic> route) => false);
+    } else {
+      Timer(const Duration(seconds: 2), LoadPage);
+    }
+  }
 
   @override
   initState() {
     super.initState();
-
-    _connectivitySubscription = Connectivity()
-        .onConnectivityChanged
-        .listen((ConnectivityResult result) {
-      setState(() {
-        _connectivityResult = result;
-      });
-    });
+    Timer(const Duration(seconds: 2), LoadPage);
   }
 
   @override
   dispose() {
     super.dispose();
-    _connectivitySubscription.cancel();
+    // subscription.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox(
+      body: Container(
         width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Connection status: ${_connectivityResult.toString()}',
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            decoration:
+                const BoxDecoration(color: Color.fromRGBO(230, 230, 230, 1)),
+            child: Stack(
+              //mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: Image(
+                    image: const AssetImage('assets/img/logo.png'),
+                    width: MediaQuery.of(context).size.width * 0.5,
+                  ),
+                ),
+                const Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 25),
+                      child: Text(
+                        'MADE BY BYTECH',
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ))
+              ],
             ),
-            const Image(image: AssetImage('assets/img/logo.png'))
-          ],
+          ),
         ),
       ),
     );

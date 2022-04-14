@@ -1,7 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:moj_majstor/InsertLocation.dart';
+import 'package:moj_majstor/InternetConnection.dart';
 import 'package:moj_majstor/Login.dart';
 import 'package:moj_majstor/proba.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 
 import 'Authentication.dart';
@@ -25,12 +28,15 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+  final InternetConnection _connection = InternetConnection();
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(primarySwatch: Colors.blueGrey),
-      home: const MyHomePage(title: 'Moj majstor'),
+    return OverlaySupport.global(
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(primarySwatch: Colors.blueGrey),
+        home: const InsertLocation(),
+      ),
     );
   }
 }
