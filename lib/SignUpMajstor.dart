@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:moj_majstor/Kategorija.dart';
 import 'package:moj_majstor/Majsor.dart';
 
 class SignUpMajstor extends StatefulWidget {
