@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:moj_majstor/InsertLocation.dart';
 import 'package:moj_majstor/InternetConnection.dart';
 import 'package:moj_majstor/Login.dart';
+import 'package:moj_majstor/Profil.dart';
 import 'package:moj_majstor/SignUp.dart';
 import 'package:moj_majstor/proba.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -20,7 +21,7 @@ class _HomeState extends State<Home> {
   final InternetConnection _connection = InternetConnection();
   int _selectedIndex = 0;
   Widget current = proba();
-  List<Widget> screens = [proba(), Login(), SignUpUser(), InsertLocation()];
+  List<Widget> screens = [proba(), Login(), SignUpUser(), Profil()];
   final PageController pageController = PageController();
   void _onItemTapped(int index) {
     setState(() {
