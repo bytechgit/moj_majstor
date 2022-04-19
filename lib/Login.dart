@@ -4,6 +4,8 @@ import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:moj_majstor/ForgotPassword.dart';
 import 'package:moj_majstor/SignUp.dart';
 import 'Authentication.dart';
+import 'package:form_field_validator/form_field_validator.dart';
+import 'package:moj_majstor/Notification.dart' as FCM;
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -14,7 +16,10 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   UserAuthentication ua = UserAuthentication();
-
+  GlobalKey<FormState> formkey = GlobalKey<FormState>();
+  bool showPassword = true;
+  final emailcontroller = TextEditingController();
+  final passwordcontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +29,8 @@ class _LoginState extends State<Login> {
           child: Container(
             height: MediaQuery.of(context).size.height -
                 MediaQuery.of(context).padding.bottom -
-                MediaQuery.of(context).padding.top,
+                MediaQuery.of(context).padding.top -
+                56,
             color: Colors.white,
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -64,36 +70,67 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 55,
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: const TextField(
-
-                      //controller: username,
-
-                      decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    filled: true,
-                    labelText: "Username",
-                    prefixIcon: Icon(Icons.people),
-                  )),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  height: 55,
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: const TextField(
-                    //controller: username,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      filled: true,
-                      labelText: "Password",
-                      prefixIcon: Icon(Icons.people),
-                    ),
+                Form(
+                  key: formkey,
+                  //autovalidateMode: AutovalidateMode.onUserInteraction,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        child: TextFormField(
+                          keyboardType: TextInputType.emailAddress,
+                          controller: emailcontroller,
+                          decoration: const InputDecoration(
+                            fillColor: Colors.white,
+                            filled: true,
+                            labelText: "Email",
+                            prefixIcon: Icon(Icons.people),
+                          ),
+                          validator: MultiValidator(
+                            [
+                              RequiredValidator(errorText: "Unesite email"),
+                              EmailValidator(
+                                  errorText: "Unesite validnu email adresu"),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        child: TextFormField(
+                          controller: passwordcontroller,
+                          obscureText: showPassword,
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                                onPressed: () => {
+                                      setState(
+                                        () => {
+                                          showPassword = !showPassword,
+                                        },
+                                      )
+                                    },
+                                icon: Icon(Icons.remove_red_eye)),
+                            fillColor: Colors.white,
+                            filled: true,
+                            labelText: "Password",
+                            prefixIcon: Icon(Icons.people),
+                          ),
+                          validator: MultiValidator(
+                            [
+                              RequiredValidator(errorText: "Unesite lozinku"),
+                              MinLengthValidator(6,
+                                  errorText:
+                                      "Lozinka mora imati najmanje 8 karaktera"),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+
                 const SizedBox(
                   height: 40,
                 ),
@@ -101,27 +138,33 @@ class _LoginState extends State<Login> {
                   width: MediaQuery.of(context).size.width * 0.85,
                   height: 50,
                   child: TextButton(
-                      onPressed: () => {
-                            ua.Login(
-                                email: 'pr123@gmail.com', password: '1233456'),
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('greska')))
-                          },
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: "century",
-                            fontSize: 25),
+                    onPressed: () async {
+                      if (formkey.currentState?.validate() == true) {
+                        String result = await ua.Login(
+                            email: emailcontroller.text,
+                            password: passwordcontroller.text);
+
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text(result)));
+                      }
+                    },
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: "century",
+                          fontSize: 25),
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color.fromRGBO(255, 152, 0, 1)),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                        ),
                       ),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              const Color.fromRGBO(255, 152, 0, 1)),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
-                          )))),
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
@@ -133,8 +176,10 @@ class _LoginState extends State<Login> {
                           text: 'FORGOT PASSWORD ?',
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              print('aaaa');
-                              ua.Kategorije();
+                              FCM.Notification.sendToChannel(
+                                  channel: 'Testing');
+                              // print('aaaa');
+                              //ua.Kategorije();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) {
@@ -160,12 +205,14 @@ class _LoginState extends State<Login> {
                           image: AssetImage('assets/img/google.png'),
                         ),
                         onTap: () async {
-                          String? p = await ua.signInwithGoogle();
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(p ?? 'Uspesno ste prijavljeni!')));
+                          String result = await ua.signInwithGoogle();
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(content: Text(result)));
                         },
                       ),
                     ),
+                    //  Text(ua.getname() ?? 'nema'),
+                    // Image.network(ua.getImage()),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 15, 0, 0),
                       child: InkWell(
@@ -173,8 +220,11 @@ class _LoginState extends State<Login> {
                           width: 50,
                           image: AssetImage('assets/img/facebook.png'),
                         ),
-                        onTap: () {
-                          ua.signInwithFacebook();
+                        onTap: () async {
+                          // ua.signInwithFacebook();
+                          String result = await ua.signInwithFacebook();
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(content: Text(result)));
                         },
                       ),
                     ),

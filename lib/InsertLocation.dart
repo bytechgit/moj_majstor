@@ -87,251 +87,239 @@ class _InsertLocationState extends State<InsertLocation> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            height: MediaQuery.of(context).size.height -
-                MediaQuery.of(context).padding.bottom -
-                MediaQuery.of(context).padding.top,
-            color: Colors.white,
-            child: Stack(children: [
-              Container(
-                height: MediaQuery.of(context).size.height,
-                child: GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  initialCameraPosition: CameraPosition(
-                    target: _center,
-                    zoom: 7.58,
-                  ),
-                  markers: Set<Marker>.of(_markers.values),
-                  zoomControlsEnabled: false,
-                  mapType: MapType.normal,
-                  onTap: (LatLng latlang) {
-                    moveCamera(latlang);
-                  },
-                  onCameraMove: (CameraPosition cameraPositiona) {
-                    isMove = true;
-
-                    setState(() => {});
-                    currentCameraPosition =
-                        cameraPositiona; //when map is dragging
-                  },
-                  onCameraIdle: () async {
-                    isMove = false;
-                    //when map drag stops
-                    if (InternetConnection.isDeviceConnected) {
-                      placemarkFromCoordinates(
-                              currentCameraPosition.target.latitude,
-                              currentCameraPosition.target.longitude)
-                          .then((List<Placemark> placemarks) {
-                        setState(() {
-                          //get place name from lat and lang
-                          locationName = placemarks.first.locality.toString() +
-                              ", " +
-                              placemarks.first.street.toString();
-                        });
-                      });
-                    } else {
-                      locationName = 'Loading..';
-                    }
-                  },
-                ),
+        child: Stack(children: [
+          Container(
+            height: MediaQuery.of(context).size.height,
+            child: GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: 7.58,
               ),
-              IgnorePointer(
-                ignoring: true,
-                child: Center(
-                  //picker image on google map
-                  child: AnimatedPadding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, isMove ? 110 : 80),
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeInOutCubic,
-                    child: Container(
-                      child: Image.asset(
-                        isMove
-                            ? "assets/img/mappicker1.png"
-                            : "assets/img/mappicker2.png",
-                        width: 80,
-                      ),
-                    ),
+              markers: Set<Marker>.of(_markers.values),
+              zoomControlsEnabled: false,
+              mapType: MapType.normal,
+              onTap: (LatLng latlang) {
+                moveCamera(latlang);
+              },
+              onCameraMove: (CameraPosition cameraPositiona) {
+                isMove = true;
+
+                setState(() => {});
+                currentCameraPosition = cameraPositiona; //when map is dragging
+              },
+              onCameraIdle: () async {
+                isMove = false;
+                //when map drag stops
+                if (InternetConnection.isDeviceConnected) {
+                  placemarkFromCoordinates(
+                          currentCameraPosition.target.latitude,
+                          currentCameraPosition.target.longitude)
+                      .then((List<Placemark> placemarks) {
+                    setState(() {
+                      //get place name from lat and lang
+                      locationName = placemarks.first.locality.toString() +
+                          ", " +
+                          placemarks.first.street.toString();
+                    });
+                  });
+                } else {
+                  locationName = 'Loading..';
+                }
+              },
+            ),
+          ),
+          IgnorePointer(
+            ignoring: true,
+            child: Center(
+              //picker image on google map
+              child: AnimatedPadding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, isMove ? 110 : 80),
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOutCubic,
+                child: Container(
+                  child: Image.asset(
+                    isMove
+                        ? "assets/img/mappicker1.png"
+                        : "assets/img/mappicker2.png",
+                    width: 80,
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.center,
-                child: AnimatedContainer(
-                  width: 1,
-                  height: 1,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOutCubic,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.8),
-                        spreadRadius: isMove ? 7 : 3,
-                        blurRadius: isMove ? 7 : 3,
-                        offset:
-                            const Offset(0, 0), // changes position of shadow
-                      ),
-                    ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: AnimatedContainer(
+              width: 1,
+              height: 1,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOutCubic,
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.8),
+                    spreadRadius: isMove ? 7 : 3,
+                    blurRadius: isMove ? 7 : 3,
+                    offset: const Offset(0, 0), // changes position of shadow
                   ),
-                ),
+                ],
               ),
-              Positioned(
-                  //widget to display location name
-                  top: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Card(
-                          child: Container(
-                              padding: const EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width - 40,
-                              child: ListTile(
-                                leading: Image.asset(
-                                  "assets/img/mappicker1.png",
-                                  width: 25,
-                                ),
-                                title: Text(
-                                  locationName,
-                                  style: const TextStyle(fontSize: 18),
-                                ),
-                                dense: true,
-                              )),
-                        ),
-                        InkWell(
-                          onTap: () async {
-                            if (!(await Geolocator
-                                .isLocationServiceEnabled())) {
-                              showSimpleNotification(
-                                  const Text(
-                                    "Morate uključiti svoju lokaciju!",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.black, fontSize: 20),
-                                  ),
-                                  background: Colors.redAccent,
-                                  duration: Duration(seconds: 3));
-                            } else {
-                              _determinePosition()
-                                  .then((Position p) => setState(() {
-                                        _center =
-                                            LatLng(p.latitude, p.longitude);
-                                        moveCamera(_center);
-                                      }));
-                            }
-                          },
-                          child: Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Image.asset(
-                                "assets/img/mylocation1.png",
-                                width: 30,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
-
-              /* Positioned(
-                  //search input bar
-                  top: 10,
-                  child: InkWell(
-                       onTap: () async {
-                        var place = await PlacesAutocomplete.show(
-                            context: context,
-                            apiKey: googleApikey,
-                            radius: 10000,
-                            mode: Mode.overlay,
-                            types: [],
-                            strictbounds: false,
-                            location: LocationWebService.Location(
-                                lat: _center.latitude, lng: _center.longitude),
-                            language: 'rs',
-                            components: [
-                              LocationWebService.Component(
-                                  LocationWebService.Component.country, 'rs')
-                            ],
-                            //google_map_webservice package
-                            onError: (err) {
-                              print(err);
-                            });
-
-                        if (place != null) {
-                          setState(() {
-                            locationSearch = place.description.toString();
-                          });
-
-                          //form google_maps_webservice package
-                          final plist = LocationWebService.GoogleMapsPlaces(
-                            apiKey: googleApikey,
-                            apiHeaders: await GoogleApiHeaders().getHeaders(),
-                            //from google_api_headers package
-                          );
-                          String placeid = place.placeId ?? "0";
-                          final detail =
-                              await plist.getDetailsByPlaceId(placeid);
-                          final geometry = detail.result.geometry!;
-                          final lat = geometry.location.lat;
-                          final lang = geometry.location.lng;
-                          var newlatlang = LatLng(lat, lang);
-
-                          //move map camera to selected place with animation
-                          mapController.animateCamera(
-                              CameraUpdate.newCameraPosition(CameraPosition(
-                                  target: newlatlang, zoom: 17)));
-                        }
-                      },
-                      child: Padding(
-                    padding: EdgeInsets.all(15),
-                    child: Card(
+            ),
+          ),
+          Positioned(
+              //widget to display location name
+              top: 0,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Card(
                       child: Container(
-                          padding: EdgeInsets.all(0),
+                          padding: const EdgeInsets.all(0),
                           width: MediaQuery.of(context).size.width - 40,
                           child: ListTile(
-                            title: Text(
-                              locationSearch,
-                              style: TextStyle(fontSize: 18),
+                            leading: Image.asset(
+                              "assets/img/mappicker1.png",
+                              width: 25,
                             ),
-                            trailing: Icon(Icons.search),
+                            title: Text(
+                              locationName,
+                              style: const TextStyle(fontSize: 18),
+                            ),
                             dense: true,
                           )),
                     ),
-                  ))),*/
-              Positioned(
-                  //search input bar
-                  bottom: 10,
-                  child: InkWell(
+                    InkWell(
                       onTap: () async {
-                        print("dgf");
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Container(
-                          child: Card(
-                            shadowColor: Colors.black,
-                            elevation: 5,
-                            child: Container(
-                              height: 70,
-                              color: Color.fromRGBO(255, 152, 0, 0.7),
-                              padding: EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width - 40,
-                              child: const Center(
-                                child: Text(
-                                  'Gotovo',
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                ),
+                        if (!(await Geolocator.isLocationServiceEnabled())) {
+                          showSimpleNotification(
+                              const Text(
+                                "Morate uključiti svoju lokaciju!",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 20),
                               ),
+                              background: Colors.redAccent,
+                              duration: Duration(seconds: 3));
+                        } else {
+                          _determinePosition()
+                              .then((Position p) => setState(() {
+                                    _center = LatLng(p.latitude, p.longitude);
+                                    moveCamera(_center);
+                                  }));
+                        }
+                      },
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Image.asset(
+                            "assets/img/mylocation1.png",
+                            width: 30,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+
+          /* Positioned(
+              //search input bar
+              top: 10,
+              child: InkWell(
+                   onTap: () async {
+                    var place = await PlacesAutocomplete.show(
+                        context: context,
+                        apiKey: googleApikey,
+                        radius: 10000,
+                        mode: Mode.overlay,
+                        types: [],
+                        strictbounds: false,
+                        location: LocationWebService.Location(
+                            lat: _center.latitude, lng: _center.longitude),
+                        language: 'rs',
+                        components: [
+                          LocationWebService.Component(
+                              LocationWebService.Component.country, 'rs')
+                        ],
+                        //google_map_webservice package
+                        onError: (err) {
+                          print(err);
+                        });
+
+                    if (place != null) {
+                      setState(() {
+                        locationSearch = place.description.toString();
+                      });
+
+                      //form google_maps_webservice package
+                      final plist = LocationWebService.GoogleMapsPlaces(
+                        apiKey: googleApikey,
+                        apiHeaders: await GoogleApiHeaders().getHeaders(),
+                        //from google_api_headers package
+                      );
+                      String placeid = place.placeId ?? "0";
+                      final detail =
+                          await plist.getDetailsByPlaceId(placeid);
+                      final geometry = detail.result.geometry!;
+                      final lat = geometry.location.lat;
+                      final lang = geometry.location.lng;
+                      var newlatlang = LatLng(lat, lang);
+
+                      //move map camera to selected place with animation
+                      mapController.animateCamera(
+                          CameraUpdate.newCameraPosition(CameraPosition(
+                              target: newlatlang, zoom: 17)));
+                    }
+                  },
+                  child: Padding(
+                padding: EdgeInsets.all(15),
+                child: Card(
+                  child: Container(
+                      padding: EdgeInsets.all(0),
+                      width: MediaQuery.of(context).size.width - 40,
+                      child: ListTile(
+                        title: Text(
+                          locationSearch,
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        trailing: Icon(Icons.search),
+                        dense: true,
+                      )),
+                ),
+              ))),*/
+          Positioned(
+              //search input bar
+              bottom: 10,
+              child: InkWell(
+                  onTap: () async {
+                    print("dgf");
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Container(
+                      child: Card(
+                        shadowColor: Colors.black,
+                        elevation: 5,
+                        child: Container(
+                          height: 70,
+                          color: Color.fromRGBO(255, 152, 0, 0.7),
+                          padding: EdgeInsets.all(0),
+                          width: MediaQuery.of(context).size.width - 40,
+                          child: const Center(
+                            child: Text(
+                              'Gotovo',
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.white),
                             ),
                           ),
                         ),
-                      ))),
-            ]),
-          ),
-        ),
+                      ),
+                    ),
+                  ))),
+        ]),
       ),
     );
   }

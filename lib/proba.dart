@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:moj_majstor/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'Majsor.dart';
+import 'homeHeaderDelegate.dart';
+
 /*
 
 Platform  Firebase App Id
@@ -23,40 +26,31 @@ class proba extends StatefulWidget {
 }
 
 class _probaState extends State<proba> {
-  final _auth = FirebaseAuth.instance;
-  String email = "sgssasa@gmail.com";
-  UserAuthentication ua = UserAuthentication();
-  Future<void> fun() async {
-    print("aaaaa");
-    try {} on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-email') {
-        print(e.message);
-      }
-    }
-  }
-
-  Future<FirebaseApp> _initializeFirebase() async {
-    FirebaseApp firebaseApp = await Firebase.initializeApp();
-    return firebaseApp;
-  }
-
-  UserCredential? userCredential;
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Firebase Authentication'),
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverPersistentHeader(
+              pinned: true,
+              floating: true,
+              delegate: HomeHeaderDelegate(openHeight: 100),
+            ),
+            SliverToBoxAdapter(
+              child: Column(children: [
+                for (int i = 0; i < 100; i++)
+                  Majstor(
+                    slika: 'assets/img/radnik.jpg',
+                    ime: 'aaa',
+                    ocena: '10',
+                  ),
+              ]),
+            ),
+          ],
         ),
-        body: IconButton(
-            onPressed: () async => {
-                  ua.SignUp(
-                      email: 'pr123@gmail.com',
-                      password: '1233456',
-                      fullName: 'Ime',
-                      profilePhoto: 'slika')
-                  //ua.handleSignIn(),
-                },
-            icon: Icon(Icons.login)));
+      ),
+    );
   }
 }

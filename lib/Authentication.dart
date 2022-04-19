@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
@@ -14,106 +15,140 @@ class UserAuthentication with ChangeNotifier {
   UserAuthentication._internal() {
     _initializeFirebase();
   }
-  getImage() {
-    if (_auth.currentUser?.photoURL != null) {
-      return _auth.currentUser!.photoURL;
-    }
-    return '';
-  }
-
   final _auth = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
-  //UserCredential? userCredential;
   CollectionReference users = FirebaseFirestore.instance.collection('Users');
-  GoogleSignInAccount? _currentUser;
-
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: <String>[
       'email',
-      //'https://www.googleapis.com/auth/contacts.readonly',
+      'https://www.googleapis.com/auth/firebase.messaging',
+      'https://www.googleapis.com/auth/firebase',
+      //'firebasenotifications.messages.create'
     ],
   );
-  Future<void> Kategorije() async {
-    print('eee');
-    final kategorije = await firestore.collection('Kategorije').get();
-    for (var k in kategorije.docs) {
-      print(k.data());
-    }
+  User? get currentUser {
+    return _auth.currentUser;
   }
 
   Future<void> signout() async {
     await _googleSignIn.signOut();
+    await FacebookAuth.instance.logOut();
     await _auth.signOut();
     notifyListeners();
   }
 
-  Future<void> signInwithFacebook() async {
-    final LoginResult pom = await FacebookAuth.instance.login();
-
-    // Log in
-    //final res = await fb.logIn(permissions: [
-    //   FacebookPermission.publicProfile,
-    // FacebookPermission.email,
-    // ]);
-    //  print(res);
+  Future<String> signInwithFacebook() async {
+    try {
+      final LoginResult result = await FacebookAuth.instance
+          .login(permissions: const ['public_profile']);
+      switch (result.status) {
+        case LoginStatus.success:
+          final AuthCredential facebookCredential =
+              FacebookAuthProvider.credential(result.accessToken!.token);
+          final userCredential =
+              await _auth.signInWithCredential(facebookCredential);
+          if (_auth.currentUser?.emailVerified == false) {
+            _auth.currentUser?.sendEmailVerification();
+          }
+          print(_auth.currentUser);
+          return 'Uspesna prijava'; //Resource(status: Status.Success);
+        case LoginStatus.cancelled:
+          return 'Prijava otkazana'; //Resource(status: Status.Cancelled);
+        case LoginStatus.failed:
+          return 'Neuspela prijava'; //Resource(status: Status.Error);
+        default:
+          return 'Greska';
+      }
+    } on FirebaseAuthException catch (e) {
+      return e.message ?? 'Greska, pokusajte ponovo';
+    }
   }
 
-  Future<String?> signInwithGoogle() async {
+  Future<String> signInwithGoogle() async {
+    this.signout();
     try {
       final GoogleSignInAccount? googleSignInAccount =
           await _googleSignIn.signIn();
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount!.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication.accessToken,
+          idToken: googleSignInAuthentication.idToken,
+        );
+        final googleAuth = await googleSignInAccount.authentication;
+        googleAuth.accessToken;
+        UserCredential uc = await _auth.signInWithCredential(credential);
+        notifyListeners();
+        final user = await _auth.currentUser;
+        final idToken = await user?.getIdToken();
+        print("token");
+        print(googleAuth.accessToken);
+        return 'Uspesno ste prijavljeni!';
+      }
 
-      // print(googleSignInAuthentication.accessToken);
-      UserCredential uc = await _auth.signInWithCredential(credential);
-      notifyListeners();
+      return 'Greska, pokusajte ponovo';
     } on FirebaseAuthException catch (e) {
-      return e.message;
+      return e.message ?? 'Greska';
     } on Exception catch (e) {
       return 'Gresaka, pokusajte ponovo!';
     }
   }
 
-  Future<void> Login({required String email, required String password}) async {
-    UserCredential uc = await _auth.signInWithEmailAndPassword(
-        email: email, password: password);
-    //  _auth.sendPasswordResetEmail(email: 'sgssasa@gmail.com')
+  Future<String> Login(
+      {required String email, required String password}) async {
+    try {
+      UserCredential uc = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      return 'Uspesno ste prijavljeni';
+    } on FirebaseAuthException catch (e) {
+      return e.message ?? 'Greska, pokusajte ponovo';
+    } catch (e) {
+      return 'Greska, pokusajte ponovo';
+    }
   }
 
-  Future<void> SignUp(
-      {required String email,
-      required String password,
-      required String fullName,
-      required String profilePhoto}) async {
+  Future<String> signUp({
+    required String email,
+    required String password,
+    required String fullName,
+    required String city,
+    required String streetAddress,
+  }) async {
     try {
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
       if (userCredential.user != null) {
+        userCredential.user!.sendEmailVerification();
         _addUser(
             uid: userCredential.user!.uid,
             fullName: fullName,
-            profilePhoto: profilePhoto);
+            city: city,
+            streetAddress: streetAddress);
       }
+      return 'Na vasu email adresu je poslat link za vrerifikaciju';
     } on FirebaseAuthException catch (e) {
-      print(e.message);
+      return e.message ?? 'Greska, pokusajte ponovo';
     } catch (e) {
-      print(e);
+      return 'Greska, pokusajte ponovo';
     }
   }
 
-  Future<void>? _addUser(
-      {required String uid,
-      required String fullName,
-      required String profilePhoto}) {
+  Future<void>? _addUser({
+    required String uid,
+    required String fullName,
+    required String city,
+    required String streetAddress,
+  }) {
     // Call the user's CollectionReference to add a new user
     return users
-        .add({'UID': uid, 'fullName': fullName, 'profilePhoto': profilePhoto})
+        .add({
+          'UID': uid,
+          'fullName': fullName,
+          'city': city,
+          'streetAddress': streetAddress
+        })
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
   }
