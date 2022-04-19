@@ -68,6 +68,8 @@ class UserAuthentication with ChangeNotifier {
         accessToken: googleSignInAuthentication.accessToken,
         idToken: googleSignInAuthentication.idToken,
       );
+
+      // print(googleSignInAuthentication.accessToken);
       UserCredential uc = await _auth.signInWithCredential(credential);
       notifyListeners();
     } on FirebaseAuthException catch (e) {

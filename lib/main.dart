@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:moj_majstor/InsertLocation.dart';
@@ -6,7 +8,7 @@ import 'package:moj_majstor/Login.dart';
 import 'package:moj_majstor/proba.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
-
+import 'package:moj_majstor/Notification.dart' as FCM;
 import 'Authentication.dart';
 import 'firebase_options.dart';
 
@@ -15,6 +17,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  final FCM.Notification _notification = FCM.Notification();
+  final InternetConnection _connection = InternetConnection();
+
   runApp(ChangeNotifierProvider(
       create: (context) => UserAuthentication(), child: const MyApp()));
 }
@@ -27,8 +32,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
-  final InternetConnection _connection = InternetConnection();
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return OverlaySupport.global(
@@ -91,6 +99,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return const InsertLocation();
                 }));
+              },
+            ),
+            ListTile(
+              title: const Text('Push Notification'),
+              onTap: () {
+                FCM.Notification.sendToChannel(channel: 'Testing');
               },
             ),
           ],
