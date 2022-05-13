@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moj_majstor/pom.dart';
 
 class ProfilePreview extends StatefulWidget {
   const ProfilePreview({Key? key}) : super(key: key);
@@ -18,12 +19,15 @@ class _ProfilePreviewState extends State<ProfilePreview> {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 20.0, bottom: 10),
-            child: CircleAvatar(
-              backgroundColor: Color.fromARGB(255, 203, 202, 202),
-              radius: 55,
+            child: Hero(
+              tag: 'proba',
               child: CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage('assets/img/radnik.jpg'),
+                backgroundColor: Color.fromARGB(255, 203, 202, 202),
+                radius: 55,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage('assets/img/radnik.jpg'),
+                ),
               ),
             ),
           ),
@@ -103,7 +107,16 @@ class _ProfilePreviewState extends State<ProfilePreview> {
             ),
           ),
           TextButton(
-            onPressed: () => {},
+            onPressed: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const Profil();
+                  },
+                ),
+              ),
+            },
             child: SizedBox(
               child: Center(
                 child: Text(

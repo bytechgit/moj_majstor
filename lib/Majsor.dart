@@ -31,7 +31,7 @@ class _MajstorState extends State<Majstor> {
               )
             },
             child: SizedBox(
-              height: 70,
+              height: 80,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

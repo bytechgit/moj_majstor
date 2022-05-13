@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:moj_majstor/AppState.dart';
 import 'package:moj_majstor/InsertLocation.dart';
 import 'package:moj_majstor/InternetConnection.dart';
 import 'package:moj_majstor/Login.dart';
@@ -20,9 +21,14 @@ void main() async {
   );
   final FCM.Notification _notification = FCM.Notification();
   final InternetConnection _connection = InternetConnection();
-
-  runApp(ChangeNotifierProvider(
-      create: (context) => UserAuthentication(), child: const Home()));
+  //AppState as = AppState();
+  //await as.ProcitajMajstori();
+  //await as.ProcitajMajstori();
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (context) => UserAuthentication()),
+    ChangeNotifierProvider(create: (context) => AppState()),
+    // Provider(create: (context) => SomeOtherClass()),
+  ], child: const Home()));
 }
 
 class MyApp extends StatefulWidget {

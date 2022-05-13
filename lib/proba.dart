@@ -1,10 +1,9 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:moj_majstor/Authentication.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-import 'Majsor.dart';
+import 'package:moj_majstor/AppState.dart';
+import 'package:moj_majstor/Majsor.dart';
+import 'package:provider/provider.dart';
 import 'homeHeaderDelegate.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 /*
 
@@ -20,35 +19,76 @@ C:\Users\sgssa\AndroidStudioProjects\moj_majstor>
  */
 class proba extends StatefulWidget {
   const proba({Key? key}) : super(key: key);
-
   @override
   State<proba> createState() => _probaState();
 }
 
 class _probaState extends State<proba> {
+  ScrollController _scrollController = ScrollController();
+  void initState() {
+    super.initState();
+  }
+
+  bool p = true;
+  Future<void> onRefresh() async {
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    int n =
+        await Provider.of<AppState>(context, listen: false).ProcitajMajstori();
+    if (n == 0) {
+      _refreshController.loadNoData();
+    } else {
+      _refreshController.loadComplete();
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       child: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPersistentHeader(
-              pinned: true,
-              floating: true,
-              delegate: HomeHeaderDelegate(openHeight: 100),
-            ),
-            SliverToBoxAdapter(
-              child: Column(children: [
-                for (int i = 0; i < 100; i++)
-                  Majstor(
-                    slika: 'assets/img/radnik.jpg',
-                    ime: 'aaa',
-                    ocena: '10',
+        child: SmartRefresher(
+          controller: _refreshController,
+          onRefresh: onRefresh,
+          onLoading: _onLoading,
+          enablePullDown: false,
+          enablePullUp: true,
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
+            controller: _scrollController,
+            slivers: [
+              SliverPersistentHeader(
+                pinned: true,
+                floating: true,
+                delegate: HomeHeaderDelegate(openHeight: 100),
+              ),
+              Consumer<AppState>(builder: (context, appstate, child) {
+                return SliverToBoxAdapter(
+                  child: Column(
+                    //for (int i = 0; i < 100; i++)
+
+                    children: appstate.majstori.map((e) {
+                      return Majstor(
+                        slika: 'assets/img/radnik.jpg',
+                        ime: e.fullName,
+                        ocena: e.score.toString(),
+                      );
+                    }).toList(),
                   ),
-              ]),
-            ),
-          ],
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );

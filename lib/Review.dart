@@ -1,26 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:moj_majstor/models/ReviewModel.dart';
 
 class Review extends StatelessWidget {
-  late String profileImage;
-  late String fullName;
-  late double rate;
-  late String commentText;
   //late double mark;
+
+  late ReviewModel _model;
 
   Review({
     Key? key,
-    required String profileImage,
-    required String fullName,
-    required double rate,
-    required String commentText,
-    //required double mark
+    required ReviewModel model,
   }) : super(key: key) {
-    this.profileImage = profileImage;
-    this.fullName = fullName;
-    this.rate = rate;
-    this.commentText = commentText;
-    //this.mark = mark;
+    _model = model;
   }
 
   @override
@@ -30,7 +21,7 @@ class Review extends StatelessWidget {
       child: Card(
         elevation: 5,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
+          borderRadius: BorderRadius.circular(20.0),
         ),
         child: Container(
           width: double.infinity,
@@ -58,7 +49,7 @@ class Review extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 25.0,
-                        backgroundImage: NetworkImage(profileImage),
+                        backgroundImage: NetworkImage(_model.profileImage),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +58,7 @@ class Review extends StatelessWidget {
                             padding:
                                 const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 0),
                             child: Text(
-                              fullName,
+                              _model.fullName,
                               style: const TextStyle(
                                 fontSize: 15.0,
                               ),
@@ -77,7 +68,7 @@ class Review extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(3.0, 0, 10.0, 0),
                             child: RatingBarIndicator(
-                              rating: rate,
+                              rating: _model.rate,
                               itemBuilder: (context, index) => const Icon(
                                 Icons.star,
                                 color: Colors.amber,
@@ -98,7 +89,8 @@ class Review extends StatelessWidget {
                 child: Container(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    commentText,
+                    _model.commentText ??
+                        " ", //treba dodati sta se desava ako nema tekst komentara
                     style: const TextStyle(
                       fontSize: 15.0,
                     ),

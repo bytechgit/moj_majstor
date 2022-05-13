@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-import 'package:oauth2_client/access_token_response.dart';
+//import 'package:oauth2_client/access_token_response.dart';
 
-import 'package:oauth2_client/google_oauth2_client.dart';
-import 'package:oauth2_client/oauth2_client.dart';
+//import 'package:oauth2_client/google_oauth2_client.dart';
+//import 'package:oauth2_client/oauth2_client.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print(
@@ -44,20 +44,20 @@ class Notification {
   }
 
   static _getOAuth2Token() async {
-    OAuth2Client googleClient = GoogleOAuth2Client(
-        redirectUri:
-            'https://www.getpostman.com/oauth2/callback', //Just one slash, required by Google specs
-        customUriScheme: 'moj-majstor-a2658');
+    // OAuth2Client googleClient = GoogleOAuth2Client(
+    //     redirectUri:
+    //         'https://www.getpostman.com/oauth2/callback', //Just one slash, required by Google specs
+    //     customUriScheme: 'moj-majstor-a2658');
 
-    AccessTokenResponse tknResp = await googleClient.getTokenWithAuthCodeFlow(
-        clientId:
-            '206265439348-s5ajde7ckopc9koe9ibmnmtbcr1fn6qa.apps.googleusercontent.com', //Your client id
-        clientSecret: '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', //Your client secret
-        scopes: [
-          'https://www.googleapis.com/auth/firebase.messaging'
-        ] //Optional
-        );
-    print(tknResp.error);
+    // AccessTokenResponse tknResp = await googleClient.getTokenWithAuthCodeFlow(
+    //     clientId:
+    //         '206265439348-s5ajde7ckopc9koe9ibmnmtbcr1fn6qa.apps.googleusercontent.com', //Your client id
+    //     clientSecret: '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', //Your client secret
+    //     scopes: [
+    //       'https://www.googleapis.com/auth/firebase.messaging'
+    //     ] //Optional
+    //     );
+    // print(tknResp.error);
   }
 
   static subscribeToChannel(String channel) {

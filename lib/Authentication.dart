@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,16 +6,38 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:moj_majstor/LocalDatabase.dart';
+import 'package:moj_majstor/models/User.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class UserAuthentication with ChangeNotifier {
   static final UserAuthentication _singleton = UserAuthentication._internal();
   factory UserAuthentication() {
     return _singleton;
   }
-
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? streamSubUser;
+  late StreamSubscription<User?> userChanges;
+  LocalDatabase l = LocalDatabase();
+  late Future<void> _hive;
+  String _verificationCode = '000000';
   UserAuthentication._internal() {
+    _hive = initializeHive();
     _initializeFirebase();
+    userChanges = _auth.userChanges().listen((event) {
+      if (event != null) {
+        UserChanges(event.uid);
+      }
+      notifyListeners();
+    });
   }
+  @override
+  void dispose() {
+    userChanges.cancel();
+    streamSubUser?.cancel();
+    super.dispose();
+  }
+
   final _auth = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
   CollectionReference users = FirebaseFirestore.instance.collection('Users');
@@ -23,7 +46,6 @@ class UserAuthentication with ChangeNotifier {
       'email',
       'https://www.googleapis.com/auth/firebase.messaging',
       'https://www.googleapis.com/auth/firebase',
-      //'firebasenotifications.messages.create'
     ],
   );
   User? get currentUser {
@@ -40,18 +62,23 @@ class UserAuthentication with ChangeNotifier {
   Future<String> signInwithFacebook() async {
     try {
       final LoginResult result = await FacebookAuth.instance
-          .login(permissions: const ['public_profile']);
+          .login(permissions: ["email", "public_profile"]);
       switch (result.status) {
         case LoginStatus.success:
           final AuthCredential facebookCredential =
               FacebookAuthProvider.credential(result.accessToken!.token);
-          final userCredential =
-              await _auth.signInWithCredential(facebookCredential);
-          if (_auth.currentUser?.emailVerified == false) {
-            _auth.currentUser?.sendEmailVerification();
+          final userObj = await _auth.signInWithCredential(facebookCredential);
+          if (userObj.user != null) {
+            if (userObj.additionalUserInfo?.isNewUser == true) {
+              _addUser(
+                  uid: userObj.user!.uid,
+                  fullName: userObj.user!.providerData[0].displayName ?? '',
+                  city: null,
+                  streetAddress: null);
+            }
+            return 'Uspesna prijava';
           }
-          print(_auth.currentUser);
-          return 'Uspesna prijava'; //Resource(status: Status.Success);
+          return 'Greska'; //Resource(status: Status.Success);
         case LoginStatus.cancelled:
           return 'Prijava otkazana'; //Resource(status: Status.Cancelled);
         case LoginStatus.failed:
@@ -61,11 +88,59 @@ class UserAuthentication with ChangeNotifier {
       }
     } on FirebaseAuthException catch (e) {
       return e.message ?? 'Greska, pokusajte ponovo';
+    } on Exception catch (e) {
+      return 'Gresaka, pokusajte ponovo!';
+    }
+  }
+
+  void signInwithPhoneNumberCode(String code) {
+    try {
+      _auth.signInWithCredential(PhoneAuthProvider.credential(
+          verificationId: _verificationCode, smsCode: code));
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+    }
+  }
+
+  Future<void> sendCodeToPhoneNumber(String phoneNumber) async {
+    try {
+      print("ddewd");
+      await _auth.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await _auth.signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          if (e.code == 'invalid-phone-number') {
+            print('The provided phone number is not valid.');
+          }
+        },
+        codeSent: (String verificationId, int? resendToken) async {
+          // Update the UI - wait for the user to enter the SMS code
+          //String smsCode = '123456';
+
+          _verificationCode = verificationId;
+          // Create a PhoneAuthCredential with the code
+          // PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          // verificationId: verificationId, smsCode: smsCode);
+
+          // Sign the user in (or link) with the credential
+          //await _auth.signInWithCredential(credential);
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          _verificationCode = verificationId;
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      //return e.message ?? 'Greska, pokusajte ponovo';
+      print(e.message);
+    } on Exception catch (e) {
+      // return 'Gresaka, pokusajte ponovo!';
     }
   }
 
   Future<String> signInwithGoogle() async {
-    this.signout();
+    signout();
     try {
       final GoogleSignInAccount? googleSignInAccount =
           await _googleSignIn.signIn();
@@ -76,14 +151,18 @@ class UserAuthentication with ChangeNotifier {
           accessToken: googleSignInAuthentication.accessToken,
           idToken: googleSignInAuthentication.idToken,
         );
-        final googleAuth = await googleSignInAccount.authentication;
-        googleAuth.accessToken;
+        //final googleAuth = await googleSignInAccount.authentication;
         UserCredential uc = await _auth.signInWithCredential(credential);
-        notifyListeners();
-        final user = await _auth.currentUser;
-        final idToken = await user?.getIdToken();
-        print("token");
-        print(googleAuth.accessToken);
+        if (uc.user != null) {
+          if (uc.additionalUserInfo?.isNewUser == true) {
+            _addUser(
+                uid: uc.user!.uid,
+                fullName: uc.user!.providerData[0].displayName ?? '',
+                city: null,
+                streetAddress: null);
+          }
+        }
+        //notifyListeners();
         return 'Uspesno ste prijavljeni!';
       }
 
@@ -138,12 +217,13 @@ class UserAuthentication with ChangeNotifier {
   Future<void>? _addUser({
     required String uid,
     required String fullName,
-    required String city,
-    required String streetAddress,
+    String? city,
+    String? streetAddress,
   }) {
     // Call the user's CollectionReference to add a new user
     return users
-        .add({
+        .doc(uid)
+        .set({
           'UID': uid,
           'fullName': fullName,
           'city': city,
@@ -153,8 +233,73 @@ class UserAuthentication with ChangeNotifier {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
+  Future<UserData> GetUser(String UID) async {
+    final p =
+        await firestore.collection('Users').where('UID', isEqualTo: UID).get();
+    UserData u = UserData.fromMap(p.docs.first.data());
+
+    return u;
+  }
+
+  // void UserChanges(String UID) {
+  //   if (streamSubUser != null) {
+  //     streamSubUser!.cancel();
+  //   }
+  //   streamSubUser = firestore
+  //       .collection("Users")
+  //       .doc(UID)
+  //       .snapshots()
+  //       .listen((result) async {
+  //     {
+  //       if (result.data() != null) {
+  //         UserData ud = UserData.fromMap(result.data()!);
+  //         await l.insertUser(ud);
+  //         inspect(await l.GetUser());
+  //       }
+  //     }
+  //   });
+  // }
+
+  void UserChanges(String UID) {
+    if (streamSubUser != null) {
+      streamSubUser!.cancel();
+    }
+    streamSubUser = firestore
+        .collection("Users")
+        .doc(UID)
+        .snapshots()
+        .listen((result) async {
+      {
+        if (result.data() != null) {
+          saveUserToLocalDb(UserData.fromMap(result.data()!));
+        }
+      }
+    });
+  }
+
   Future<FirebaseApp> _initializeFirebase() async {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
     return firebaseApp;
+  }
+
+  ///hive
+  ///
+  ///
+  Future<void> initializeHive() async {
+    final directory = await getApplicationDocumentsDirectory();
+    await Hive.initFlutter(directory.path);
+    Hive.registerAdapter(UserDataAdapter(), override: true);
+  }
+
+  Future<void> saveUserToLocalDb(UserData user) async {
+    await _hive;
+    var userBox = await Hive.openBox('userBox');
+    await userBox.put('profile', user);
+  }
+
+  Future<UserData> getUserFromLocalDb() async {
+    await _hive;
+    var userBox = await Hive.openBox('userBox');
+    return userBox.get('profile');
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:moj_majstor/AppState.dart';
+import 'package:provider/provider.dart';
 
 class HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
   double toolBarHeight;
@@ -25,13 +27,20 @@ class HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
           ),
           child: Row(
             children: [
-              Card(
-                child: SizedBox(
-                  width: 70,
-                  height: 70,
-                ),
-                color: Colors.red,
-              ),
+              Consumer<AppState>(builder: (context, appstate, child) {
+                return GestureDetector(
+                  onTap: (() async {
+                    await appstate.ProcitajMajstori();
+                  }),
+                  child: Card(
+                    child: SizedBox(
+                      width: 70,
+                      height: 70,
+                    ),
+                    color: Colors.red,
+                  ),
+                );
+              }),
               Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,

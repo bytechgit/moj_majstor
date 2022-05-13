@@ -17,14 +17,22 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         color: Colors.white,
         child: Center(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Image.asset("assets/img/Reset_password.png"),
+                  ),
+                ),
+              ),
               const Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 25),
                 child: Text(
                   'Zaboravili ste lozinku?',
                   style: TextStyle(
-                      fontSize: 30, color: Color.fromRGBO(255, 152, 0, 1)),
+                      fontSize: 30, color: Color.fromARGB(255, 100, 120, 254)),
                 ),
               ),
               const Padding(
@@ -50,33 +58,34 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 )),
               ),
               const SizedBox(
-                height: 20,
+                height: 80,
+              ),
+              Container(
+                height: 45,
+                margin:
+                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 30),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      primary: Color.fromARGB(183, 100, 121, 254),
+                      elevation: 5),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text(
+                            'Na vasu email adresu je poslat link za izmenu lozinke')));
+                  },
+                  child: Center(
+                      child: Text(
+                    "Resetuj lozinku",
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  )),
+                ),
               ),
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.85,
                 height: 50,
-                child: TextButton(
-                    onPressed: () => {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text(
-                                  'Na vasu email adresu je poslat link za izmenu lozinke')))
-                        },
-                    child: const Text(
-                      'Resetuj lozinku',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "century",
-                          fontSize: 25),
-                    ),
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            const Color.fromRGBO(255, 152, 0, 1)),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18.0),
-                        )))),
-              ),
+              )
             ],
           ),
         ),

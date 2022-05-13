@@ -25,13 +25,23 @@ class _SignUpUserState extends State<SignUpUser> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Color.fromRGBO(20, 33, 61, 1),
+            backgroundColor: Color.fromARGB(255, 144, 159, 254),
             pinned: true,
-            expandedHeight: 200.0,
+            expandedHeight: 230.0,
             flexibleSpace: FlexibleSpaceBar(
+              titlePadding: EdgeInsets.only(left: 20, bottom: 20),
               title: Text('Registracija'),
               background: Container(
-                color: Colors.orange,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color.fromARGB(255, 100, 121, 254),
+                      Color.fromARGB(255, 144, 159, 254),
+                    ],
+                  ),
+                ),
                 child: const Icon(
                   Icons.supervised_user_circle,
                   color: Colors.white,
@@ -42,7 +52,7 @@ class _SignUpUserState extends State<SignUpUser> {
           ),
           SliverToBoxAdapter(
             child: Container(
-              color: Colors.orange,
+              color: Color.fromARGB(183, 100, 121, 254),
               child: Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -163,10 +173,14 @@ class _SignUpUserState extends State<SignUpUser> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20.0, bottom: 20),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          height: 50,
-                          child: TextButton(
+                        child: Container(
+                          height: 45,
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 16.0, horizontal: 30),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                primary: Color.fromARGB(255, 144, 159, 254),
+                                elevation: 5),
                             onPressed: () async {
                               if (formkey.currentState?.validate() == true) {
                                 String result = await ua.signUp(
@@ -180,23 +194,14 @@ class _SignUpUserState extends State<SignUpUser> {
                                     SnackBar(content: Text(result)));
                               }
                             },
-                            child: const Text(
-                              'Kreirej nalog',
-                              style: TextStyle(
+                            child: Center(
+                                child: Text(
+                              'Kreirej nalog'.toUpperCase(),
+                              style: const TextStyle(
                                   color: Colors.white,
-                                  fontFamily: "century",
-                                  fontSize: 25),
-                            ),
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  const Color.fromRGBO(255, 152, 0, 1)),
-                              shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                ),
-                              ),
-                            ),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            )),
                           ),
                         ),
                       ),
