@@ -43,48 +43,6 @@ class _ReviewsState extends State<Reviews> {
                   height: 40,
                 ),
               ],
-              /* Review(
-                    profileImage:
-                        "https://www.unmc.edu/cihc/_images/faculty/default.jpg",
-                    rate: 2.5,
-                    fullName: 'Marija',
-                    commentText:
-                        "afdsg afdsg sjvirej dfvnrekn dkfjri dfhuefhu dfjhozjhb ehfueh rufh48 zou76ohjb"),
-                Review(
-                    profileImage:
-                        "https://www.unmc.edu/cihc/_images/faculty/default.jpg",
-                    rate: 2.5,
-                    fullName: 'Marija',
-                    commentText:
-                        "afdsg afdsg sjvirej dfvnrekn dkfjri dfhuefhu dfjhozjhb ehfueh rufh48 zou76ohjb"),
-                Review(
-                    profileImage:
-                        "https://www.unmc.edu/cihc/_images/faculty/default.jpg",
-                    rate: 2.5,
-                    fullName: 'Marija',
-                    commentText:
-                        "afdsg afdsg sjvirej dfvnrekn dkfjri dfhuefhu dfjhozjhb ehfueh rufh48 zou76ohjb"),
-                Review(
-                    profileImage:
-                        "https://www.unmc.edu/cihc/_images/faculty/default.jpg",
-                    rate: 2.5,
-                    fullName: 'Marija',
-                    commentText:
-                        "afdsg afdsg sjvirej dfvnrekn dkfjri dfhuefhu dfjhozjhb ehfueh rufh48 zou76ohjb"),
-                Review(
-                    profileImage:
-                        "https://www.unmc.edu/cihc/_images/faculty/default.jpg",
-                    rate: 2.5,
-                    fullName: 'Marija',
-                    commentText:
-                        "afdsg afdsg sjvirej dfvnrekn dkfjri dfhuefhu dfjhozjhb ehfueh rufh48 zou76ohjb"),
-                Review(
-                    profileImage:
-                        "https://www.unmc.edu/cihc/_images/faculty/default.jpg",
-                    rate: 2.5,
-                    fullName: 'Marija',
-                    commentText:
-                        "afdsg afdsg sjvirej dfvnrekn dkfjri dfhuefhu dfjhozjhb ehfueh rufh48 zou76ohjb"),*/
             ),
           ),
           Align(

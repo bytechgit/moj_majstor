@@ -1,34 +1,59 @@
-class Majstor {
+class MajstorModel {
   final String UID;
   final String? city;
   final String fullName;
   final String? streetAddress;
-  final double? score;
   final String? phoneNumber;
+  final List<String>? occupation;
+  final String? description;
+  final double? rate;
+  final int? reviewsNumber;
+  final int? recommendationNumber;
+  final String? profilePicture;
+  final String? primaryOccupation;
 
-  const Majstor(
+  MajstorModel(
       {required this.UID,
       this.city,
       required this.fullName,
       this.streetAddress,
       this.phoneNumber,
-      this.score});
+      this.occupation,
+      this.description,
+      this.rate = 0,
+      this.reviewsNumber,
+      this.recommendationNumber,
+      this.profilePicture,
+      this.primaryOccupation});
   Map<String, dynamic> toMap() {
     return {
       'UID': UID,
       'fullName': fullName,
       'city': city,
       'streetAddress': streetAddress,
-      'score': score,
-      'phoneNumber': phoneNumber
+      'phoneNumber': phoneNumber,
+      'occupation': occupation,
+      'rate': rate,
+      'reviewsNumber': reviewsNumber,
+      'recommendationNumber': recommendationNumber,
+      'profilePicture': profilePicture,
+      'primaryOccupation': primaryOccupation
     };
   }
 
-  Majstor.fromMap(Map<String, dynamic> map)
+  MajstorModel.fromMap(Map<String, dynamic> map)
       : UID = map["UID"],
         city = map["city"],
         fullName = map["fullName"],
         streetAddress = map["streetAddress"],
-        score = map["score"],
-        phoneNumber = map["phoneNumber"];
+        phoneNumber = map["phoneNumber"],
+        occupation = (((map["occupation"] ?? []) as List<dynamic>)
+            .map((e) => e.toString())
+            .toList()),
+        description = map["description"],
+        rate = ((map["rate"]) ?? 0).toDouble(),
+        reviewsNumber = map["reviewsNumber"],
+        recommendationNumber = map["recommendationNumber"],
+        profilePicture = map["profilePicture"],
+        primaryOccupation = map["primaryOccupation"];
 }

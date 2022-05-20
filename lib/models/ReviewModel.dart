@@ -5,14 +5,9 @@ class ReviewModel {
   String? commentText;
 
   ReviewModel({
-    required String profileImage,
-    required String fullName,
-    required double rate,
-    String? commentText,
-  }) {
-    this.profileImage = profileImage;
-    this.fullName = fullName;
-    this.rate = rate;
-    this.commentText = commentText;
-  }
+    required this.profileImage,
+    required this.fullName,
+    required this.rate,
+    this.commentText,
+  });
 }

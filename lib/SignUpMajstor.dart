@@ -61,101 +61,101 @@ class _SignUpMajstorState extends State<SignUpMajstor> {
           Container(
             child: Expanded(
               child: ListView(
-                // padding: EdgeInsets.only(left: 10, right: 10),
-                //childAspectRatio: 5 / 2,
-                children: maj.map((e) {
-                  return Majstor(
-                    slika: e['slika'] ?? '',
-                    ime: e['ime'] ?? '',
-                    ocena: e['ocena'] ?? '',
-                  );
-                }).toList(),
-                // children: [
-                //   Container(
-                //     height: 20,
-                //     child: Card(
-                //       color: Colors.red,
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(20.0),
-                //       ),
-                //       shadowColor: Colors.black,
-                //       elevation: 10,
-                //       child: Column(
-                //         children: [
-                //           //  Spacer(),
-                //           Expanded(
-                //             child: Padding(
-                //               padding: const EdgeInsets.only(top: 8.0),
-                //               child: Image(
-                //                 image: AssetImage('assets/img/elektricar.png'),
-                //               ),
-                //             ),
-                //           ),
-                //           FittedBox(
-                //             child: Padding(
-                //               padding: const EdgeInsets.all(20.0),
-                //               child: Text(
-                //                 "Elektricar",
-                //                 style:
-                //                     TextStyle(fontSize: 25, color: Colors.white),
-                //               ),
-                //             ),
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                //   Card(
-                //     color: Colors.red,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(20.0),
-                //     ),
-                //     shadowColor: Colors.black,
-                //     elevation: 10,
-                //   ),
-                //   Card(
-                //     color: Colors.red,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(20.0),
-                //     ),
-                //     shadowColor: Colors.black,
-                //     elevation: 10,
-                //   ),
-                //   Card(
-                //     color: Colors.red,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(20.0),
-                //     ),
-                //     shadowColor: Colors.black,
-                //     elevation: 10,
-                //   ),
-                //   Card(
-                //     color: Colors.red,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(20.0),
-                //     ),
-                //     shadowColor: Colors.black,
-                //     elevation: 10,
-                //   ),
-                //   Card(
-                //     color: Colors.red,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(20.0),
-                //     ),
-                //     shadowColor: Colors.black,
-                //     elevation: 10,
-                //   ),
-                //   Card(
-                //     color: Colors.red,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(20.0),
-                //     ),
-                //     shadowColor: Colors.black,
-                //     elevation: 10,
-                //   ),
-                // ],
-                //crossAxisCount: 1,
-              ),
+                  // padding: EdgeInsets.only(left: 10, right: 10),
+                  //childAspectRatio: 5 / 2,
+                  // children: maj.map((e) {
+                  //   return Majstor(
+                  //     slika: e['slika'] ?? '',
+                  //     ime: e['ime'] ?? '',
+                  //     ocena: e['ocena'] ?? '',
+                  //   );
+                  // }).toList(),
+                  // children: [
+                  //   Container(
+                  //     height: 20,
+                  //     child: Card(
+                  //       color: Colors.red,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(20.0),
+                  //       ),
+                  //       shadowColor: Colors.black,
+                  //       elevation: 10,
+                  //       child: Column(
+                  //         children: [
+                  //           //  Spacer(),
+                  //           Expanded(
+                  //             child: Padding(
+                  //               padding: const EdgeInsets.only(top: 8.0),
+                  //               child: Image(
+                  //                 image: AssetImage('assets/img/elektricar.png'),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //           FittedBox(
+                  //             child: Padding(
+                  //               padding: const EdgeInsets.all(20.0),
+                  //               child: Text(
+                  //                 "Elektricar",
+                  //                 style:
+                  //                     TextStyle(fontSize: 25, color: Colors.white),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  //   Card(
+                  //     color: Colors.red,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(20.0),
+                  //     ),
+                  //     shadowColor: Colors.black,
+                  //     elevation: 10,
+                  //   ),
+                  //   Card(
+                  //     color: Colors.red,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(20.0),
+                  //     ),
+                  //     shadowColor: Colors.black,
+                  //     elevation: 10,
+                  //   ),
+                  //   Card(
+                  //     color: Colors.red,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(20.0),
+                  //     ),
+                  //     shadowColor: Colors.black,
+                  //     elevation: 10,
+                  //   ),
+                  //   Card(
+                  //     color: Colors.red,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(20.0),
+                  //     ),
+                  //     shadowColor: Colors.black,
+                  //     elevation: 10,
+                  //   ),
+                  //   Card(
+                  //     color: Colors.red,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(20.0),
+                  //     ),
+                  //     shadowColor: Colors.black,
+                  //     elevation: 10,
+                  //   ),
+                  //   Card(
+                  //     color: Colors.red,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(20.0),
+                  //     ),
+                  //     shadowColor: Colors.black,
+                  //     elevation: 10,
+                  //   ),
+                  // ],
+                  //crossAxisCount: 1,
+                  ),
             ),
           ),
         ],

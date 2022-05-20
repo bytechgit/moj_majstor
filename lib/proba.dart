@@ -1,6 +1,8 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:moj_majstor/AppState.dart';
 import 'package:moj_majstor/Majsor.dart';
+import 'package:moj_majstor/SearchFilterDrawer.dart';
 import 'package:provider/provider.dart';
 import 'homeHeaderDelegate.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -30,6 +32,7 @@ class _probaState extends State<proba> {
   }
 
   bool p = true;
+
   Future<void> onRefresh() async {
     _refreshController.refreshCompleted();
   }
@@ -53,41 +56,44 @@ class _probaState extends State<proba> {
       RefreshController(initialRefresh: false);
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: SafeArea(
-        child: SmartRefresher(
-          controller: _refreshController,
-          onRefresh: onRefresh,
-          onLoading: _onLoading,
-          enablePullDown: false,
-          enablePullUp: true,
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics()),
-            controller: _scrollController,
-            slivers: [
-              SliverPersistentHeader(
-                pinned: true,
-                floating: true,
-                delegate: HomeHeaderDelegate(openHeight: 100),
-              ),
-              Consumer<AppState>(builder: (context, appstate, child) {
-                return SliverToBoxAdapter(
-                  child: Column(
-                    //for (int i = 0; i < 100; i++)
+    return Scaffold(
+      endDrawer: SafeArea(
+        child: FilterDrawer(),
+      ),
+      body: Container(
+        color: Colors.white,
+        child: SafeArea(
+          child: SmartRefresher(
+            controller: _refreshController,
+            onRefresh: onRefresh,
+            onLoading: _onLoading,
+            enablePullDown: false,
+            enablePullUp: true,
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              controller: _scrollController,
+              slivers: [
+                SliverPersistentHeader(
+                  pinned: true,
+                  floating: true,
+                  delegate: HomeHeaderDelegate(openHeight: 200),
+                ),
+                Consumer<AppState>(builder: (context, appstate, child) {
+                  return SliverToBoxAdapter(
+                    child: Column(
+                      //for (int i = 0; i < 100; i++)
 
-                    children: appstate.majstori.map((e) {
-                      return Majstor(
-                        slika: 'assets/img/radnik.jpg',
-                        ime: e.fullName,
-                        ocena: e.score.toString(),
-                      );
-                    }).toList(),
-                  ),
-                );
-              }),
-            ],
+                      children: appstate.majstori.map((e) {
+                        return Majstor(
+                          majstor: e,
+                        );
+                      }).toList(),
+                    ),
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       ),

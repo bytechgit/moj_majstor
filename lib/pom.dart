@@ -2,416 +2,461 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:moj_majstor/Authentication.dart';
+import 'package:moj_majstor/EditProfileMajstor.dart';
 import 'package:moj_majstor/Review.dart';
+import 'package:moj_majstor/Reviews.dart';
+import 'package:moj_majstor/models/Majstor.dart';
+import 'package:moj_majstor/models/ReviewModel.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:moj_majstor/ProfilePreview.dart';
+import 'package:moj_majstor/EditProfileMajstor.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import 'Inbox.dart';
+import 'ReviewLinearRating.dart';
+import 'models/InboxModel.dart';
 
 class Profil extends StatefulWidget {
-  const Profil({Key? key}) : super(key: key);
+  final MajstorModel majstor;
+  const Profil({Key? key, required this.majstor}) : super(key: key);
 
   @override
   State<Profil> createState() => _ProfilState();
 }
 
 class _ProfilState extends State<Profil> {
-  //UserAuthentication ua = UserAuthentication();
-  final double _rating = 3.5;
-  double _callButtonSize = 65;
-  String imePrezime = 'Ime Prezime';
-  String zanimanje = 'Zanimanje';
-  String slika = 'https://www.unmc.edu/cihc/_images/faculty/default.jpg';
-  final String _number = '0655200509';
-  String opis =
-      'Nesto o majstoru jfdsuiv ndfjinvifm vioewd vjiervn dokmci virwmcid wnvurwnc iqemn vuie9 vjeui cmqei 9vnmeic xmcewr ivneu9 fci9e wmc iewrn vjifdmv iofe';
+  bool fullScreenComments = false;
+  bool isFollowing = false;
+  int lenght = 4;
+  List<Widget> getOccupations(List<String>? strings) {
+    List<Widget> list = [];
+    if (strings != null) {
+      for (var i = 0; i < strings.length; i++) {
+        list.add(
+          Padding(
+            padding: EdgeInsets.only(right: 5, bottom: 5),
+            child: Chip(
+              label: Text(strings[i]),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        );
+      }
+    }
+    return list;
+  }
+
+  List<InboxModel> inboxmodel = [];
+  Color favoriteColor = Colors.grey;
+  Color likeColor = Colors.grey;
   @override
   void initState() {
+    inboxmodel.add(InboxModel(
+        profilePhoto:
+            "https://lh3.googleusercontent.com/ogw/ADea4I6uQeJPyoCB5xCXF5eKxHM_NEKnu6V0iE__X4fA=s64-c-mo",
+        name: "Marija Krsanin",
+        time: "01:12",
+        lastMessage: "cao"));
+    inboxmodel.add(InboxModel(
+        profilePhoto:
+            "https://lh3.googleusercontent.com/ogw/ADea4I6uQeJPyoCB5xCXF5eKxHM_NEKnu6V0iE__X4fA=s64-c-mo",
+        name: "Marija Krsanin",
+        time: "yesterday",
+        lastMessage: "cao"));
+    inboxmodel.add(InboxModel(
+        profilePhoto:
+            "https://lh3.googleusercontent.com/ogw/ADea4I6uQeJPyoCB5xCXF5eKxHM_NEKnu6V0iE__X4fA=s64-c-mo",
+        name: "Marija Krsanin",
+        time: "yesterday",
+        lastMessage: "cao"));
+
     super.initState();
   }
 
-  Future<void> _callNumber() async {
-    var res = await launch("tel:0655200509"); //callNumber(_number);
-    print(res);
+  Future<void> _callNumber(String phoneNumber) async {
+    var res = await launch("tel:$phoneNumber"); //callNumber(_number);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserAuthentication>(builder: (context, ua, child) {
-      return Scaffold(
-        backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
-        body: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: Color.fromRGBO(245, 245, 245, 1),
+      body: SafeArea(
+        child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              Center(
-                child: Container(
-                  color: const Color.fromRGBO(245, 245, 245, 1),
-                  height: 400.0,
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: Column(
-                    children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          const SizedBox(
-                            height: 60.0,
-                          ),
-                          Hero(
-                            tag: 'proba',
-                            child: CircleAvatar(
-                              radius: 70.0,
-                              backgroundImage: NetworkImage(ua
-                                      .currentUser?.photoURL ??
-                                  "https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg"),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 15.0,
-                          ),
-                          Text(
-                            imePrezime,
-                            style: const TextStyle(
-                              fontSize: 23.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 5.0,
-                          ),
-                        ],
-                      ),
-                      Text(
-                        zanimanje,
-                        style: const TextStyle(
-                            fontSize: 15.0, color: Colors.black),
-                      ),
-                      const SizedBox(
-                        height: 10.0,
-                      ),
-                      RatingBarIndicator(
-                        rating: _rating,
-                        itemBuilder: (context, index) => const Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
-                        itemCount: 5,
-                        itemSize: 30.0,
-                        direction: Axis.horizontal,
-                      ),
-                      Container(
-                        width: 140,
-                        height: 50,
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              ua.signout();
-                            },
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
-                              child: const Text(
-                                'Prati',
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              /* GestureDetector(
-                  onTap: () => _callNumber(),
-                  child: Container(
-                    height: 60.0,
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(horizontal: 80.0),
-                    decoration: BoxDecoration(
-                      color: Colors.green[300],
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Row(
-                      children: <Widget>[
-                        const SizedBox(
-                          width: 20.0,
-                        ),
-                        const Icon(
-                          Icons.phone,
-                        ),
-                        const SizedBox(
-                          width: 20.0,
-                        ),
-                        Text(
-                          _number,
-                          style: const TextStyle(
-                            fontSize: 22.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ), */
-
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 15),
-                child: Card(
-                  elevation: 5,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  child: Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+              Stack(
+                children: [
+                  Container(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
-                      child: Column(
-                        children: [
-                          Container(
-                            alignment: Alignment.topLeft,
-                            padding: const EdgeInsets.only(
-                              bottom: 1,
-                            ),
-                            decoration: const BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  width: 1.0,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                            child: const Text(
-                              'Opis',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            child: Text(
-                              opis,
-                              style: const TextStyle(
-                                fontSize: 15.0,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ),
-                        ],
+                      padding: const EdgeInsets.fromLTRB(0, 5, 15, 0),
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditProfileMajstor(
+                                    majstor: widget.majstor)),
+                          );
+                        },
+                        icon: Icon(Icons.settings),
+                        iconSize: 30,
+                        color: Colors.white,
+                        alignment: Alignment.topRight,
                       ),
                     ),
-                  ),
-                ),
-              ),
-              // Padding(
-              //  padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-              // child: Card(
-              //  elevation: 5,
-              // ignore: prefer_const_literals_to_create_immutables
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10.0, 0, 10, 0),
-                child: Container(
-                  width: double.infinity,
-                  //  alignment: Alignment.topLeft,
-                  child: Card(
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.comment,
-                            size: 30.0,
-                            color: Colors.grey,
-                          ),
-                          // ignore: prefer_const_constructors
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10.0, 0, 0, 0),
-                            child: const Text(
-                              'Komentari',
-                              style: TextStyle(
-                                fontSize: 20.0,
-                              ),
-                              // textAlign: TextAlign.left,
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(),
-                          ),
-                          const Icon(
-                            Icons.keyboard_arrow_right,
-                            size: 35.0,
-                            color: Colors.grey,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              /*   Row(children: [
-                  const Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child: CircleAvatar(
-                      radius: 20.0,
-                      backgroundImage: NetworkImage(
-                          'https://www.unmc.edu/cihc/_images/faculty/default.jpg'),
-                    ),
-                  ),
-                  Expanded(
-                    // height: 50,
-                    // width: MediaQuery.of(context).size.width * 0.70,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 0.0),
-                      child: TextField(
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        //   expands: true,
-                        //controller: username,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(width: 3, color: Colors.blue),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          //labelText: 'Enter Name',
-                          hintText: 'Dodaj komentar...',
-                          suffixIcon: Icon(Icons.arrow_forward),
-                          hintMaxLines: 5,
-
-                          // prefixIcon: Icon(Icons.people),
-                        ),
-                      ),
-                    ),
-                  ),
-                ]),*/
-              //  ),
-              //  ),
-
-              /* Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 25, 25, 0),
-                  child: Container(
-                    alignment: Alignment.topLeft,
-                    padding: const EdgeInsets.only(
-                      bottom: 1,
-                    ),
+                    height: 250,
+                    width: double.infinity,
                     decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          width: 2.0,
-                          color: Colors.grey,
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Color.fromARGB(255, 100, 121, 254),
+                          Color.fromARGB(255, 144, 159, 254),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 150.0),
+                    child: Container(
+                      width: double.infinity,
+                      // height: MediaQuery.of(context).size.height,
+                      //     height: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
                         ),
+                        color: Colors.white,
                       ),
-                    ),
-                    child: const Text(
-                      'Komentari',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                      ),
-                      textAlign: TextAlign.left,
-                    ),
-                  ),
-                ),
-                Row(children: [
-                  const Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child: CircleAvatar(
-                      radius: 20.0,
-                      backgroundImage: NetworkImage(
-                          'https://www.unmc.edu/cihc/_images/faculty/default.jpg'),
-                    ),
-                  ),
-                  Expanded(
-                    // height: 50,
-                    // width: MediaQuery.of(context).size.width * 0.70,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(5.0, 20.0, 10.0, 0.0),
-                      child: TextField(
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        //   expands: true,
-                        //controller: username,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(width: 3, color: Colors.blue),
-                            borderRadius: BorderRadius.circular(15),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 85),
+                          child: Column(
+                            children: [
+                              Text(
+                                widget.majstor.fullName,
+                                style: TextStyle(
+                                    fontSize: 30.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87),
+                                textAlign: TextAlign.left,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                child: Text(
+                                  'elektricar',
+                                  //ua.currentUser?.primaryOccupation ?? "aa",
+                                  style: const TextStyle(
+                                    fontSize: 15.0,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 35, 15, 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          'Ocena',
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                        RatingBarIndicator(
+                                          rating: widget.majstor.rate ??
+                                              0, //ua.currentUser?.rate ?? 0,
+                                          itemBuilder: (context, index) =>
+                                              const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                          ),
+                                          itemCount: 5,
+                                          itemSize: 22.0,
+                                          direction: Axis.horizontal,
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          'Preporuke',
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                        Text(
+                                          (widget.majstor
+                                                      .recommendationNumber ??
+                                                  0)
+                                              .toString(),
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          'Recenzije',
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                        Text(
+                                          (widget.majstor.reviewsNumber ?? 0)
+                                              .toString(),
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          width: 1.0,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              if (favoriteColor ==
+                                                  Colors.grey) {
+                                                Fluttertoast.showToast(
+                                                  msg: 'Dodato u omiljene',
+                                                  gravity: ToastGravity.BOTTOM,
+                                                );
+                                                favoriteColor = Color.fromARGB(
+                                                    255, 100, 120, 254);
+                                              } else
+                                                favoriteColor = Colors.grey;
+                                            });
+                                          },
+                                          icon: Icon(
+                                            Icons.favorite,
+                                            color: favoriteColor,
+                                            size: 30,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          width: 1.0,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (likeColor == Colors.grey) {
+                                              Fluttertoast.showToast(
+                                                msg: 'Preporučeno',
+                                                gravity: ToastGravity.BOTTOM,
+                                              );
+                                              likeColor = Color.fromARGB(
+                                                  255, 100, 120, 254);
+                                            } else
+                                              likeColor = Colors.grey;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.thumb_up,
+                                          color: likeColor,
+                                          size: 30,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                            width: 1.0,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) => Inbox(
+                                                      models: inboxmodel)),
+                                            );
+                                          },
+                                          icon: Icon(
+                                            Icons.comment,
+                                            color: Colors.grey,
+                                            size: 30,
+                                          ),
+                                        )),
+                                  ],
+                                ),
+                              ),
+                              Divider(thickness: 1),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.topLeft,
+                                      padding: const EdgeInsets.only(
+                                        bottom: 1,
+                                      ),
+                                      child: const Text(
+                                        'Opis',
+                                        style: TextStyle(
+                                          fontSize: 25.0,
+                                        ),
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: Text(
+                                        widget.majstor.description ?? "",
+                                        style: const TextStyle(
+                                          fontSize: 15.0,
+                                        ),
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Divider(thickness: 1),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.topLeft,
+                                      child: const Text(
+                                        'Veštine i znanja',
+                                        style: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 25),
+                                      ),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Wrap(
+                                            children: getOccupations(
+                                                widget.majstor.occupation)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Divider(
+                                thickness: 1,
+                              ),
+                              ReviewRating(),
+                              Review(
+                                model: ReviewModel(
+                                    fullName: 'Sasa Stojiljkovic',
+                                    rate: 4.5,
+                                    commentText:
+                                        'You can try removing the maxLines: 1, and adding width constraints to your Text e.g wrapping it with a SizedBox, this way the text will wrap to the next line :',
+                                    profileImage:
+                                        'https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'),
+                              ),
+                              Review(
+                                model: ReviewModel(
+                                    fullName: 'Sasa Stojiljkovic',
+                                    rate: 4.5,
+                                    commentText:
+                                        'You can try removing the maxLines: 1, and adding width constraints to your Text e.g wrapping it with a SizedBox, this way the text will wrap to the next line :',
+                                    profileImage:
+                                        'https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'),
+                              ),
+                              Review(
+                                model: ReviewModel(
+                                    fullName: 'Sasa Stojiljkovic',
+                                    rate: 4.5,
+                                    commentText:
+                                        'You can try removing the maxLines: 1, and adding width constraints to your Text e.g wrapping it with a SizedBox, this way the text will wrap to the next line :',
+                                    profileImage:
+                                        'https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'),
+                              ),
+                              Review(
+                                model: ReviewModel(
+                                    fullName: 'Sasa Stojiljkovic',
+                                    rate: 4.5,
+                                    commentText:
+                                        'You can try removing the maxLines: 1, and adding width constraints to your Text e.g wrapping it with a SizedBox, this way the text will wrap to the next line :',
+                                    profileImage:
+                                        'https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'),
+                              ),
+                              SizedBox(
+                                height: 70,
+                              )
+                            ],
                           ),
-                          //labelText: 'Enter Name',
-                          hintText: 'Dodaj komentar...',
-                          suffixIcon: Icon(Icons.arrow_forward),
-                          hintMaxLines: 5,
-
-                          // prefixIcon: Icon(Icons.people),
                         ),
                       ),
                     ),
                   ),
-                ]),
-                Review(
-                    profileImage:
-                        "https://www.unmc.edu/cihc/_images/faculty/default.jpg",
-                    rate: 2.5,
-                    fullName: 'Marija',
-                    commentText:
-                        "afdsg afdsg sjvirej dfvnrekn dkfjri dfhuefhu dfjhozjhb ehfueh rufh48 zou76ohjb"),
-                Review(
-                    profileImage:
-                        "https://www.unmc.edu/cihc/_images/faculty/default.jpg",
-                    rate: 3.5,
-                    fullName: "Marija",
-                    commentText:
-                        "afdsg sjvirej dfvnrekn dkfjri dfhuefhu dfjhozjhb ehfueh rufh48 zou76ohjb"), */
+                  Padding(
+                    padding: const EdgeInsets.only(top: 80),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: CircleAvatar(
+                        radius: 75,
+                        backgroundColor: Color.fromARGB(255, 126, 143, 247),
+                        child: CircleAvatar(
+                          radius: 70.0,
+                          backgroundImage: NetworkImage(
+                            widget.majstor.profilePicture ??
+                                "https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
-        floatingActionButton: AnimatedContainer(
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.fastOutSlowIn,
-          height: _callButtonSize,
-          width: _callButtonSize,
-          child: SizedBox(
-            //height: 65.0,
-            // width: 65.0,
-            child: FittedBox(
-              child: FloatingActionButton(
-                backgroundColor: Colors.green[300],
-                child: const Icon(Icons.phone),
-                onPressed: () {
-                  setState(() {
-                    _callButtonSize = 500;
-                  });
-
-                  _callNumber().then((value) {
-                    //  _callButtonSize = 65;
-                  });
-                },
-              ),
-            ),
-          ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _callNumber(widget.majstor.phoneNumber ?? "0000000");
+          });
+        },
+        child: const Icon(
+          Icons.phone,
+          color: Colors.white,
         ),
-        /* floatingActionButton: FloatingActionButton(
-            onPressed: () {},
-            child: const Icon(
-              Icons.phone,
-              color: Colors.white,
-            ),
-            backgroundColor: Colors.green[300],
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,*/
-      );
-    });
+        backgroundColor: Color.fromARGB(255, 100, 121, 254),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
   }
 }

@@ -12,6 +12,8 @@ import 'package:moj_majstor/ProfilePreview.dart';
 import 'package:moj_majstor/EditProfileMajstor.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'models/Majstor.dart';
+
 class Profil extends StatefulWidget {
   const Profil({
     Key? key,
@@ -22,40 +24,47 @@ class Profil extends StatefulWidget {
 }
 
 class _ProfilState extends State<Profil> {
-  final double _rating = 3.5;
   bool fullScreenComments = false;
-  String imePrezime = 'Ime Prezime';
-  String zanimanje = 'Zanimanje';
-  String slika =
-      "https://img.freepik.com/free-photo/portrait-white-man-isolated_53876-40306.jpg?w=2000"; //'https://www.unmc.edu/cihc/_images/faculty/default.jpg';
-  final String _number = '0655200509';
   bool isFollowing = false;
-  String pracenja = '266';
-  String preporuke = '2585';
   int lenght = 4;
+  List<Widget> getOccupations(List<String>? strings) {
+    List<Widget> list = [];
+    if (strings != null) {
+      for (var i = 0; i < strings.length; i++) {
+        list.add(
+          Padding(
+            padding: EdgeInsets.only(right: 5, bottom: 5),
+            child: Chip(
+              label: Text(strings[i]),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        );
+      }
+    }
+    return list;
+  }
+
   Color favoriteColor = Colors.grey;
   Color likeColor = Colors.grey;
-  String opis =
-      'Nesto o majstoru jfdsuiv ndfjinvifm vioewd vjiervn dokmci virwmcid wnvurwnc iqemn vuie9 vjeui cmqei 9vnmeic xmcewr ivneu9 fci9e wmc iewrn vjifdmv iofe';
   @override
   void initState() {
     super.initState();
   }
 
-  Future<void> _callNumber() async {
-    var res = await launch("tel:0655200509"); //callNumber(_number);
-    print(res);
+  Future<void> _callNumber(String phoneNumber) async {
+    var res = await launch("tel:$phoneNumber"); //callNumber(_number);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromRGBO(245, 245, 245, 1),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Consumer<UserAuthentication>(
-              builder: (context, ua, child) => Stack(
+    return Consumer<UserAuthentication>(
+      builder: (context, ua, child) => Scaffold(
+        backgroundColor: Color.fromRGBO(245, 245, 245, 1),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Stack(
                 children: [
                   Container(
                     child: Padding(
@@ -65,7 +74,12 @@ class _ProfilState extends State<Profil> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => EditProfileMajstor()),
+                                builder: (context) => EditProfileMajstor(
+                                      majstor: MajstorModel(
+                                          UID: '11111',
+                                          fullName: 'Sasa Stojiljkovic',
+                                          occupation: ['aaaas']),
+                                    )),
                           );
                         },
                         icon: Icon(Icons.settings),
@@ -81,8 +95,8 @@ class _ProfilState extends State<Profil> {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Color.fromARGB(255, 100, 120, 254),
-                          Color.fromARGB(195, 107, 92, 204),
+                          Color.fromARGB(255, 100, 121, 254),
+                          Color.fromARGB(255, 144, 159, 254),
                         ],
                       ),
                     ),
@@ -106,7 +120,7 @@ class _ProfilState extends State<Profil> {
                           child: Column(
                             children: [
                               Text(
-                                ua.currentUser?.displayName ?? "nema",
+                                ua.currentUser?.fullName ?? "",
                                 style: TextStyle(
                                     fontSize: 30.0,
                                     fontWeight: FontWeight.bold,
@@ -116,7 +130,7 @@ class _ProfilState extends State<Profil> {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                                 child: Text(
-                                  zanimanje,
+                                  ua.currentUser?.primaryOccupation ?? "aa",
                                   style: const TextStyle(
                                     fontSize: 15.0,
                                   ),
@@ -137,7 +151,7 @@ class _ProfilState extends State<Profil> {
                                           style: TextStyle(fontSize: 20),
                                         ),
                                         RatingBarIndicator(
-                                          rating: _rating,
+                                          rating: ua.currentUser?.rate ?? 0,
                                           itemBuilder: (context, index) =>
                                               const Icon(
                                             Icons.star,
@@ -156,7 +170,10 @@ class _ProfilState extends State<Profil> {
                                           style: TextStyle(fontSize: 20),
                                         ),
                                         Text(
-                                          preporuke,
+                                          (ua.currentUser
+                                                      ?.recommendationNumber ??
+                                                  0)
+                                              .toString(),
                                           style: TextStyle(fontSize: 20),
                                         ),
                                       ],
@@ -168,7 +185,8 @@ class _ProfilState extends State<Profil> {
                                           style: TextStyle(fontSize: 20),
                                         ),
                                         Text(
-                                          pracenja,
+                                          (ua.currentUser?.reviewsNumber ?? 0)
+                                              .toString(),
                                           style: TextStyle(fontSize: 20),
                                         ),
                                       ],
@@ -315,7 +333,7 @@ class _ProfilState extends State<Profil> {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 10),
                                       child: Text(
-                                        opis,
+                                        ua.currentUser?.description ?? "",
                                         style: const TextStyle(
                                           fontSize: 15.0,
                                         ),
@@ -333,7 +351,7 @@ class _ProfilState extends State<Profil> {
                                   children: [
                                     Container(
                                       alignment: Alignment.topLeft,
-                                      child: Text(
+                                      child: const Text(
                                         'Veštine i znanja',
                                         style: TextStyle(
                                             color: Colors.black87,
@@ -345,43 +363,8 @@ class _ProfilState extends State<Profil> {
                                       child: Padding(
                                         padding: const EdgeInsets.only(top: 10),
                                         child: Wrap(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 5),
-                                              child:
-                                                  Chip(label: Text('Bla bla')),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 5),
-                                              child: Chip(
-                                                  label:
-                                                      Text('dnvcdfnviefnvuic')),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 5),
-                                              child: Chip(
-                                                label: Text('njc cbdsh jcbdsh'),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 5),
-                                              child: Chip(label: Text('jdfvn')),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 5),
-                                              child: Chip(
-                                                  label: Text('vmdfjbnjfnb')),
-                                            ),
-                                            Chip(
-                                              label: Text('ncncn'),
-                                            ),
-                                          ],
-                                        ),
+                                            children: getOccupations(
+                                                ua.currentUser?.occupation)),
                                       ),
                                     ),
                                   ],
@@ -399,11 +382,12 @@ class _ProfilState extends State<Profil> {
                       alignment: Alignment.center,
                       child: CircleAvatar(
                         radius: 75,
-                        backgroundColor: Color.fromARGB(255, 100, 120, 254),
+                        backgroundColor: Color.fromARGB(255, 126, 143, 247),
                         child: CircleAvatar(
                           radius: 70.0,
                           backgroundImage: NetworkImage(
-                            ua.currentUser?.photoURL ?? "nema",
+                            ua.currentUser?.profilePicture ??
+                                "https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
                           ),
                         ),
                       ),
@@ -411,23 +395,23 @@ class _ProfilState extends State<Profil> {
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _callNumber();
-          });
-        },
-        child: const Icon(
-          Icons.phone,
-          color: Colors.white,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              _callNumber(ua.currentUser?.phoneNumber ?? "0000000");
+            });
+          },
+          child: const Icon(
+            Icons.phone,
+            color: Colors.white,
+          ),
+          backgroundColor: Color.fromARGB(255, 100, 121, 254),
         ),
-        backgroundColor: Color.fromARGB(255, 100, 120, 254),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

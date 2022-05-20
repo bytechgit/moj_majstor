@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:moj_majstor/models/Majstor.dart';
 import 'package:moj_majstor/pom.dart';
 
 class ProfilePreview extends StatefulWidget {
-  const ProfilePreview({Key? key}) : super(key: key);
+  final MajstorModel majstor;
+  const ProfilePreview({Key? key, required this.majstor}) : super(key: key);
 
   @override
   State<ProfilePreview> createState() => _ProfilePreviewState();
@@ -17,7 +19,7 @@ class _ProfilePreviewState extends State<ProfilePreview> {
       color: Colors.white,
       child: Column(
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 20.0, bottom: 10),
             child: Hero(
               tag: 'proba',
@@ -26,13 +28,14 @@ class _ProfilePreviewState extends State<ProfilePreview> {
                 radius: 55,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: AssetImage('assets/img/radnik.jpg'),
+                  backgroundImage: NetworkImage(widget.majstor.profilePicture ??
+                      "https://www.jestiveslike.com/wp-content/uploads/2016/06/builder_bob_-_majstor_bob_03.jpg"),
                 ),
               ),
             ),
           ),
-          const Text(
-            'Sasa Stojliljkovic',
+          Text(
+            widget.majstor.fullName,
             style: TextStyle(
                 color: Colors.orange,
                 fontSize: 25,
@@ -112,7 +115,9 @@ class _ProfilePreviewState extends State<ProfilePreview> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return const Profil();
+                    return Profil(
+                      majstor: widget.majstor,
+                    );
                   },
                 ),
               ),

@@ -205,7 +205,6 @@ class _LoginState extends State<Login> {
                     onTap: () async {
                       // ua.signInwithPhoneNumber();
                       String result = await ua.signInwithGoogle();
-                      inspect(await ua.getUserFromLocalDb());
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text(result)));
                     },

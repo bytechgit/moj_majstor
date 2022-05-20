@@ -1,30 +1,40 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_tags/flutter_tags.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:moj_majstor/InsertLocation.dart';
 import 'dart:io';
 
+import 'package:moj_majstor/models/Majstor.dart';
+
 class EditProfileMajstor extends StatefulWidget {
-  const EditProfileMajstor({Key? key}) : super(key: key);
+  MajstorModel majstor;
+  EditProfileMajstor({Key? key, required this.majstor}) : super(key: key);
 
   @override
   State<EditProfileMajstor> createState() => _EditProfileMajstorState();
 }
 
 class _EditProfileMajstorState extends State<EditProfileMajstor> {
-  late File imageFile;
-  String profilePhoto = 'https://www.unmc.edu/cihc/_images/faculty/default.jpg';
-  String nameSurname = "Ime i prezime";
-  String occupation = "Zanimanje";
-  String about = "Opis";
-  String phoneNumber = "Broj telefona";
-  String address = "Adresa";
+  File? imageFile;
+  late String profilePhoto = widget.majstor.profilePicture ??
+      'https://www.unmc.edu/cihc/_images/faculty/default.jpg';
 
-  final namecontroller = TextEditingController();
-  final occupationcontroller = TextEditingController();
-  final aboutcontroller = TextEditingController();
-  final phoneNumbercontroller = TextEditingController();
+  late TextEditingController namecontroller =
+      TextEditingController(text: widget.majstor.fullName);
+  late TextEditingController occupationcontroller =
+      TextEditingController(text: widget.majstor.primaryOccupation);
+  late TextEditingController aboutcontroller =
+      TextEditingController(text: widget.majstor.description);
+  late TextEditingController phoneNumbercontroller =
+      TextEditingController(text: widget.majstor.phoneNumber);
+  late TextEditingController addresscontroller = TextEditingController(
+      text: (widget.majstor.city ?? "") +
+          ", " +
+          (widget.majstor.streetAddress ?? ""));
+  late TextEditingController tagcontroller = TextEditingController();
 
   get formkey => null;
   @override
@@ -40,6 +50,7 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
         ),
       ),
       body: Container(
+        color: Colors.white,
         child: SingleChildScrollView(
           child: Center(
             child: Column(
@@ -53,7 +64,9 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                   },
                   child: CircleAvatar(
                     radius: 70.0,
-                    backgroundImage: NetworkImage(profilePhoto),
+                    backgroundImage: (imageFile != null)
+                        ? FileImage(File(imageFile!.path))
+                        : NetworkImage(profilePhoto) as ImageProvider,
                     child: Stack(children: const [
                       Positioned(
                         bottom: 5,
@@ -74,17 +87,7 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                   ),
                 ),
                 const SizedBox(
-                  height: 7.0,
-                ),
-                InkWell(
-                  onTap: () => _getFromGallery(),
-                  child: const Text(
-                    "Promenite sliku na profilu",
-                    style: TextStyle(color: Color.fromARGB(255, 100, 120, 254)),
-                  ),
-                ),
-                const SizedBox(
-                  height: 40.0,
+                  height: 20.0,
                 ),
                 Form(
                   key: formkey,
@@ -98,7 +101,7 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                           decoration: InputDecoration(
                             fillColor: Colors.white,
                             filled: true,
-                            labelText: nameSurname,
+                            labelText: 'Ime i prezime',
                             labelStyle: const TextStyle(color: Colors.black54),
                             prefixIcon: const Icon(Icons.person),
                           ),
@@ -118,7 +121,7 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                           decoration: InputDecoration(
                             fillColor: Colors.white,
                             filled: true,
-                            labelText: occupation,
+                            labelText: 'Zanimanje',
                             labelStyle: const TextStyle(color: Colors.black54),
                             prefixIcon: const Icon(Icons.engineering),
                           ),
@@ -137,7 +140,7 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                           decoration: InputDecoration(
                             fillColor: Colors.white,
                             filled: true,
-                            labelText: phoneNumber,
+                            labelText: 'Broj telefona',
                             labelStyle: const TextStyle(color: Colors.black54),
                             prefixIcon: const Icon(Icons.phone),
                           ),
@@ -159,7 +162,7 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                           decoration: InputDecoration(
                             fillColor: Colors.white,
                             filled: true,
-                            labelText: about,
+                            labelText: 'Opis',
                             labelStyle: const TextStyle(color: Colors.black54),
                             prefixIcon: const Icon(Icons.description),
                           ),
@@ -173,41 +176,90 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 5),
-                        child: Container(
-                          height: 65,
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                width: 1.0,
-                                color: Colors.black54,
-                              ),
+                        child: TextFormField(
+                          controller: addresscontroller,
+                          maxLines: 3,
+                          minLines: 1,
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.map),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) {
+                                    return const InsertLocation();
+                                  }),
+                                );
+                              },
                             ),
+                            fillColor: Colors.white,
+                            filled: true,
+                            labelText: 'Adresa',
+                            labelStyle: const TextStyle(color: Colors.black54),
+                            prefixIcon: const Icon(Icons.description),
                           ),
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                                backgroundColor: Colors.white),
-                            onPressed: () {},
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.pin_drop,
-                                  color: Colors.black45,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 15),
-                                  child: Text(
-                                    address,
-                                    style: const TextStyle(
-                                      color: Colors.black45,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          validator: MultiValidator(
+                            [
+                              RequiredValidator(errorText: "Unesite adresu"),
+                            ],
                           ),
                         ),
                       ),
                     ],
+                  ),
+                ),
+                Wrap(
+                  children: widget.majstor.occupation!
+                      .map(
+                        (e) => Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Chip(
+                            deleteIcon: Icon(
+                              Icons.close,
+                              size: 20,
+                            ),
+                            onDeleted: () {
+                              setState(() {
+                                widget.majstor.occupation?.remove(e);
+                              });
+                            },
+                            label: Text(
+                              e,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: TextFormField(
+                    controller: tagcontroller,
+                    maxLines: 3,
+                    minLines: 1,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          setState(() {
+                            widget.majstor.occupation?.add(tagcontroller.text);
+                            tagcontroller.text = '';
+                          });
+                        },
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                      labelText: 'Tagovi',
+                      hintText: 'Dodaj tag',
+                      labelStyle: const TextStyle(color: Colors.black54),
+                      prefixIcon: const Icon(Icons.tag),
+                    ),
+                    validator: MultiValidator(
+                      [
+                        RequiredValidator(errorText: "Unesite adresu"),
+                      ],
+                    ),
                   ),
                 ),
                 Padding(

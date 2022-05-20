@@ -7,7 +7,7 @@ import 'package:moj_majstor/models/Majstor.dart';
 class AppState with ChangeNotifier {
   AppState() {}
   final _firestore = FirebaseFirestore.instance;
-  List<Majstor> majstori = [];
+  List<MajstorModel> majstori = [];
   DocumentSnapshot<Object?>? lastReadedDoc;
   Future<int> ProcitajMajstori() async {
     if (lastReadedDoc == null) {
@@ -17,7 +17,7 @@ class AppState with ChangeNotifier {
           .limit(2)
           .get());
       for (var document in newDocumentList.docs) {
-        majstori.add(Majstor.fromMap(document.data()));
+        majstori.add(MajstorModel.fromMap(document.data()));
       }
       lastReadedDoc = newDocumentList.docs.last;
       notifyListeners();
@@ -30,7 +30,7 @@ class AppState with ChangeNotifier {
           .limit(2)
           .get());
       for (var document in newDocumentList.docs) {
-        majstori.add(Majstor.fromMap(document.data()));
+        majstori.add(MajstorModel.fromMap(document.data()));
       }
       if (newDocumentList.docs.isNotEmpty) {
         lastReadedDoc = newDocumentList.docs.last;

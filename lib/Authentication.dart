@@ -20,13 +20,22 @@ class UserAuthentication with ChangeNotifier {
   late StreamSubscription<User?> userChanges;
   LocalDatabase l = LocalDatabase();
   late Future<void> _hive;
+  UserData? user;
   String _verificationCode = '000000';
   UserAuthentication._internal() {
-    _hive = initializeHive();
+    _hive = initializeHive().then((value) {
+      getUserFromLocalDb().then((value) {
+        user = value;
+        notifyListeners();
+      });
+    });
     _initializeFirebase();
     userChanges = _auth.userChanges().listen((event) {
       if (event != null) {
         UserChanges(event.uid);
+      } else {
+        user = null;
+        saveUserToLocalDb(null);
       }
       notifyListeners();
     });
@@ -48,15 +57,23 @@ class UserAuthentication with ChangeNotifier {
       'https://www.googleapis.com/auth/firebase',
     ],
   );
-  User? get currentUser {
-    return _auth.currentUser;
+  UserData? get currentUser {
+    if (user != null) {
+      return user;
+    }
+    getUserFromLocalDb().then((value) {
+      user = value;
+      if (user != null) {
+        notifyListeners();
+      }
+    });
+    return null;
   }
 
   Future<void> signout() async {
     await _googleSignIn.signOut();
     await FacebookAuth.instance.logOut();
     await _auth.signOut();
-    notifyListeners();
   }
 
   Future<String> signInwithFacebook() async {
@@ -74,7 +91,8 @@ class UserAuthentication with ChangeNotifier {
                   uid: userObj.user!.uid,
                   fullName: userObj.user!.providerData[0].displayName ?? '',
                   city: null,
-                  streetAddress: null);
+                  streetAddress: null,
+                  profilePicture: userObj.user!.providerData[0].photoURL);
             }
             return 'Uspesna prijava';
           }
@@ -104,7 +122,6 @@ class UserAuthentication with ChangeNotifier {
 
   Future<void> sendCodeToPhoneNumber(String phoneNumber) async {
     try {
-      print("ddewd");
       await _auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
@@ -116,16 +133,7 @@ class UserAuthentication with ChangeNotifier {
           }
         },
         codeSent: (String verificationId, int? resendToken) async {
-          // Update the UI - wait for the user to enter the SMS code
-          //String smsCode = '123456';
-
           _verificationCode = verificationId;
-          // Create a PhoneAuthCredential with the code
-          // PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          // verificationId: verificationId, smsCode: smsCode);
-
-          // Sign the user in (or link) with the credential
-          //await _auth.signInWithCredential(credential);
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           _verificationCode = verificationId;
@@ -159,13 +167,13 @@ class UserAuthentication with ChangeNotifier {
                 uid: uc.user!.uid,
                 fullName: uc.user!.providerData[0].displayName ?? '',
                 city: null,
-                streetAddress: null);
+                streetAddress: null,
+                profilePicture: uc.user!.providerData[0].photoURL);
           }
         }
-        //notifyListeners();
+        notifyListeners();
         return 'Uspesno ste prijavljeni!';
       }
-
       return 'Greska, pokusajte ponovo';
     } on FirebaseAuthException catch (e) {
       return e.message ?? 'Greska';
@@ -219,6 +227,7 @@ class UserAuthentication with ChangeNotifier {
     required String fullName,
     String? city,
     String? streetAddress,
+    String? profilePicture,
   }) {
     // Call the user's CollectionReference to add a new user
     return users
@@ -227,7 +236,9 @@ class UserAuthentication with ChangeNotifier {
           'UID': uid,
           'fullName': fullName,
           'city': city,
-          'streetAddress': streetAddress
+          'streetAddress': streetAddress,
+          'profilePicture': profilePicture,
+          'occupation': []
         })
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
@@ -272,6 +283,8 @@ class UserAuthentication with ChangeNotifier {
       {
         if (result.data() != null) {
           saveUserToLocalDb(UserData.fromMap(result.data()!));
+          user = UserData.fromMap(result.data()!);
+          notifyListeners();
         }
       }
     });
@@ -291,13 +304,13 @@ class UserAuthentication with ChangeNotifier {
     Hive.registerAdapter(UserDataAdapter(), override: true);
   }
 
-  Future<void> saveUserToLocalDb(UserData user) async {
+  Future<void> saveUserToLocalDb(UserData? user) async {
     await _hive;
     var userBox = await Hive.openBox('userBox');
     await userBox.put('profile', user);
   }
 
-  Future<UserData> getUserFromLocalDb() async {
+  Future<UserData?> getUserFromLocalDb() async {
     await _hive;
     var userBox = await Hive.openBox('userBox');
     return userBox.get('profile');
