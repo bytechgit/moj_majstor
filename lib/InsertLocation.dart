@@ -7,11 +7,14 @@ import 'package:moj_majstor/InternetConnection.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class InsertLocation extends StatefulWidget {
-  const InsertLocation({Key? key}) : super(key: key);
+  final StringCallback callback;
+  const InsertLocation({Key? key, required this.callback}) : super(key: key);
 
   @override
   State<InsertLocation> createState() => _InsertLocationState();
 }
+
+typedef StringCallback = void Function(String val);
 
 class _InsertLocationState extends State<InsertLocation> {
   late GoogleMapController mapController;
@@ -213,12 +216,12 @@ class _InsertLocationState extends State<InsertLocation> {
                       },
                       child: Card(
                         child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Image.asset(
-                            "assets/img/mylocation1.png",
-                            width: 30,
-                          ),
-                        ),
+                            padding: const EdgeInsets.all(5.0),
+                            child: Icon(
+                              Icons.my_location,
+                              size: 30,
+                              color: Color.fromARGB(255, 144, 159, 254),
+                            )),
                       ),
                     ),
                   ],
@@ -299,20 +302,26 @@ class _InsertLocationState extends State<InsertLocation> {
                   },
                   child: Padding(
                     padding: EdgeInsets.all(15),
-                    child: Container(
-                      child: Card(
-                        shadowColor: Colors.black,
-                        elevation: 5,
-                        child: Container(
-                          height: 70,
-                          color: Color.fromRGBO(255, 152, 0, 0.7),
-                          padding: EdgeInsets.all(0),
-                          width: MediaQuery.of(context).size.width - 40,
-                          child: const Center(
-                            child: Text(
-                              'Gotovo',
-                              style:
-                                  TextStyle(fontSize: 20, color: Colors.white),
+                    child: InkWell(
+                      onTap: (() {
+                        widget.callback(locationName);
+                        Navigator.pop(context);
+                      }),
+                      child: Container(
+                        child: Card(
+                          shadowColor: Colors.black,
+                          elevation: 5,
+                          child: Container(
+                            height: 60,
+                            color: Color.fromARGB(255, 144, 159, 254),
+                            padding: EdgeInsets.all(0),
+                            width: MediaQuery.of(context).size.width - 40,
+                            child: const Center(
+                              child: Text(
+                                'Gotovo',
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.white),
+                              ),
                             ),
                           ),
                         ),

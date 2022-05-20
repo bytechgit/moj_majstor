@@ -19,6 +19,7 @@ class EditProfileMajstor extends StatefulWidget {
 
 class _EditProfileMajstorState extends State<EditProfileMajstor> {
   File? imageFile;
+  set string(String value) => setState(() => widget.majstor.city = value);
   late String profilePhoto = widget.majstor.profilePicture ??
       'https://www.unmc.edu/cihc/_images/faculty/default.jpg';
 
@@ -187,7 +188,10 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) {
-                                    return const InsertLocation();
+                                    return InsertLocation(callback: (val) {
+                                      setState(
+                                          () => addresscontroller.text = val);
+                                    });
                                   }),
                                 );
                               },
@@ -196,7 +200,7 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                             filled: true,
                             labelText: 'Adresa',
                             labelStyle: const TextStyle(color: Colors.black54),
-                            prefixIcon: const Icon(Icons.description),
+                            prefixIcon: const Icon(Icons.home),
                           ),
                           validator: MultiValidator(
                             [
@@ -264,14 +268,18 @@ class _EditProfileMajstorState extends State<EditProfileMajstor> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Sačuvaj izmene',
-                      style: TextStyle(fontSize: 17),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 100, 120, 254),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    height: 45,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: const Text(
+                        'Sačuvaj izmene',
+                        style: TextStyle(fontSize: 17),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(255, 100, 120, 254),
+                      ),
                     ),
                   ),
                 ),

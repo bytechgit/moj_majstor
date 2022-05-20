@@ -104,7 +104,9 @@ class _MyHomePageState extends State<MyHomePage> {
               title: const Text('lokacija 2'),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const InsertLocation();
+                  return InsertLocation(
+                    callback: (val) {},
+                  );
                 }));
               },
             ),

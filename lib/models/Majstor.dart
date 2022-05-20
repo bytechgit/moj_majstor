@@ -1,16 +1,16 @@
 class MajstorModel {
-  final String UID;
-  final String? city;
-  final String fullName;
-  final String? streetAddress;
-  final String? phoneNumber;
-  final List<String>? occupation;
-  final String? description;
-  final double? rate;
-  final int? reviewsNumber;
-  final int? recommendationNumber;
-  final String? profilePicture;
-  final String? primaryOccupation;
+  String UID;
+  String? city;
+  String fullName;
+  String? streetAddress;
+  String? phoneNumber;
+  List<String>? occupation;
+  String? description;
+  double? rate;
+  int? reviewsNumber;
+  int? recommendationNumber;
+  String? profilePicture;
+  String? primaryOccupation;
 
   MajstorModel(
       {required this.UID,

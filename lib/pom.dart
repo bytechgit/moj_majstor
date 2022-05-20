@@ -146,13 +146,13 @@ class _ProfilState extends State<Profil> {
                                 textAlign: TextAlign.left,
                               ),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
                                 child: Text(
-                                  'elektricar',
+                                  widget.majstor.primaryOccupation ?? "",
                                   //ua.currentUser?.primaryOccupation ?? "aa",
                                   style: const TextStyle(
-                                    fontSize: 15.0,
-                                  ),
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w600),
                                   textAlign: TextAlign.left,
                                 ),
                               ),
@@ -219,49 +219,34 @@ class _ProfilState extends State<Profil> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          width: 1.0,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              if (favoriteColor ==
-                                                  Colors.grey) {
-                                                Fluttertoast.showToast(
-                                                  msg: 'Dodato u omiljene',
-                                                  gravity: ToastGravity.BOTTOM,
-                                                );
-                                                favoriteColor = Color.fromARGB(
-                                                    255, 100, 120, 254);
-                                              } else
-                                                favoriteColor = Colors.grey;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            Icons.favorite,
-                                            color: favoriteColor,
-                                            size: 30,
-                                          ),
+                                    Card(
+                                      elevation: 3,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (favoriteColor == Colors.grey) {
+                                              Fluttertoast.showToast(
+                                                msg: 'Dodato u omiljene',
+                                                gravity: ToastGravity.BOTTOM,
+                                              );
+                                              favoriteColor = Color.fromARGB(
+                                                  255, 100, 120, 254);
+                                            } else
+                                              favoriteColor = Colors.grey;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.favorite,
+                                          color: favoriteColor,
+                                          size: 30,
                                         ),
                                       ),
                                     ),
                                     SizedBox(
                                       width: 20,
                                     ),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          width: 1.0,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
+                                    Card(
+                                      elevation: 3,
                                       child: IconButton(
                                         onPressed: () {
                                           setState(() {
@@ -286,30 +271,24 @@ class _ProfilState extends State<Profil> {
                                     SizedBox(
                                       width: 20,
                                     ),
-                                    Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          border: Border.all(
-                                            width: 1.0,
-                                            color: Colors.grey,
-                                          ),
+                                    Card(
+                                      elevation: 3,
+                                      child: IconButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Inbox(models: inboxmodel)),
+                                          );
+                                        },
+                                        icon: Icon(
+                                          Icons.message,
+                                          color: Colors.grey,
+                                          size: 30,
                                         ),
-                                        child: IconButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) => Inbox(
-                                                      models: inboxmodel)),
-                                            );
-                                          },
-                                          icon: Icon(
-                                            Icons.comment,
-                                            color: Colors.grey,
-                                            size: 30,
-                                          ),
-                                        )),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),

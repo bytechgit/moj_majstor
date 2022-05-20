@@ -37,7 +37,7 @@ class _ProfilePreviewState extends State<ProfilePreview> {
           Text(
             widget.majstor.fullName,
             style: TextStyle(
-                color: Colors.orange,
+                color: Color.fromARGB(255, 144, 159, 254),
                 fontSize: 25,
                 fontWeight: FontWeight.w500),
           ),
@@ -137,8 +137,8 @@ class _ProfilePreviewState extends State<ProfilePreview> {
               height: 30,
             ),
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(
-                  const Color.fromRGBO(255, 152, 0, 1)),
+              backgroundColor:
+                  MaterialStateProperty.all(Color.fromARGB(255, 144, 159, 254)),
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18.0),
