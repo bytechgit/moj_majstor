@@ -1,19 +1,18 @@
-import 'dart:convert';
+import 'dart:async';
+import 'dart:developer';
 
+import 'package:bitmap/bitmap.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-//import 'package:oauth2_client/access_token_response.dart';
-
-//import 'package:oauth2_client/google_oauth2_client.dart';
-//import 'package:oauth2_client/oauth2_client.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print(
       '----------------------------------------------------------------------------');
-  // print('Handling a background message ${jsonEncode(message.notification)}');
 }
 
 class Notification {
@@ -22,42 +21,39 @@ class Notification {
   late AndroidNotificationChannel channel;
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   static String? _token;
+  late StreamSubscription<RemoteMessage> onMessageSubscription;
+  Hmac hmacSha256 =
+      Hmac(sha256, utf8.encode("MfgR78fS7FSAh78FSAUJi8FSU895H9Lo"));
 
   factory Notification() {
     return _instance;
   }
 
   Notification._internal() {
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    _requestPermission();
-    _loadFCM();
-    _listenFCM();
-
-    _getFCMToken().then((token) {
-      print(_token);
-    });
-
-    subscribeToChannel("Testing");
-
-    //_getOAuth2Token();
+    initFirebase();
   }
 
-  static _getOAuth2Token() async {
-    // OAuth2Client googleClient = GoogleOAuth2Client(
-    //     redirectUri:
-    //         'https://www.getpostman.com/oauth2/callback', //Just one slash, required by Google specs
-    //     customUriScheme: 'moj-majstor-a2658');
+  Future<void> initFirebase() async {
+    await FirebaseMessaging.instance.setAutoInitEnabled(true);
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    await _requestPermission();
+    await _loadFCM();
+    await _getFCMToken();
+    await _listenFCM();
+    print("TOKEN: " + (_token ?? ""));
+    //subscribeToChannel("Testing");
+    subscribeDevice("Krstaa");
+    /*sendMessagetoUser(
+        "1q0SMGMEvrddmMdxUc6CD4xArxQ2",
+        "Krstaa",
+        "Naslov",
+        "Poruka",
+        "https://lh3.googleusercontent.com/ogw/ADea4I5QE6YC4BVEVAdwwNyA50IVvir9dNDgkrnFNVw-gQ=s32-c-mo");*/
+    // unSubscribeDevice("Krstaa");
+  }
 
-    // AccessTokenResponse tknResp = await googleClient.getTokenWithAuthCodeFlow(
-    //     clientId:
-    //         '206265439348-s5ajde7ckopc9koe9ibmnmtbcr1fn6qa.apps.googleusercontent.com', //Your client id
-    //     clientSecret: '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', //Your client secret
-    //     scopes: [
-    //       'https://www.googleapis.com/auth/firebase.messaging'
-    //     ] //Optional
-    //     );
-    // print(tknResp.error);
+  void dispose() {
+    onMessageSubscription.cancel();
   }
 
   static subscribeToChannel(String channel) {
@@ -68,8 +64,13 @@ class Notification {
     FirebaseMessaging.instance.unsubscribeFromTopic(channel);
   }
 
-  void _listenFCM() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  Future<void> _listenFCM() async {
+    //onforeground
+
+    onMessageSubscription =
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      Bitmap bitmap = await Bitmap.fromProvider(const NetworkImage(
+          'https://lh3.googleusercontent.com/ogw/ADea4I5QE6YC4BVEVAdwwNyA50IVvir9dNDgkrnFNVw-gQ=s32-c-mo'));
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null && !kIsWeb) {
@@ -79,32 +80,34 @@ class Notification {
           notification.body,
           NotificationDetails(
             //ovde hvata notifikacije u aplikaciji
-            android: AndroidNotificationDetails(
-              channel.id, channel.name,
-              // TODO add a proper drawable resource to android, for now using
-              //      one that already exists in example app.
-              icon: 'app_icon',
-              playSound: true,
-              //  sound: const RawResourceAndroidNotificationSound(
-              //    'notification_sound'),
-              enableLights: true,
-              ledColor: Colors.orange,
-              ledOnMs: 100,
-              ledOffMs: 100,
-              color: Colors.orange,
-              colorized: true,
-            ),
+            android: AndroidNotificationDetails(channel.id, channel.name,
+                // TODO add a proper drawable resource to android, for now using
+                //      one that already exists in example app.
+                icon: 'app_icon',
+                playSound: true,
+                //  sound: const RawResourceAndroidNotificationSound(
+                //    'notification_sound'),
+                enableLights: true,
+                ledColor: Colors.orange,
+                ledOnMs: 100,
+                ledOffMs: 100,
+                color: Colors.orange,
+                colorized: true,
+                largeIcon: bitmap.buildImage() as AndroidBitmap<
+                    Object>), //'https://lh3.googleusercontent.com/ogw/ADea4I5QE6YC4BVEVAdwwNyA50IVvir9dNDgkrnFNVw-gQ=s32-c-mo'),
           ),
         );
       }
     });
   }
 
+  Stream<String> onTokenRefresh() => FirebaseMessaging.instance.onTokenRefresh;
+
   Future<void> _loadFCM() async {
     if (!kIsWeb) {
       channel = const AndroidNotificationChannel(
           'high_importance_channel', // id
-          'High Importance Notifications', // title
+          'High Importance Notifications', // title+
           importance: Importance.high,
           enableVibration: true,
           playSound: true,
@@ -114,7 +117,6 @@ class Notification {
           ledColor: Colors.orange);
 
       flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
       //const AndroidInitializationSettings initializationSettingsAndroid =
       //  AndroidInitializationSettings('app_icon');
 
@@ -140,7 +142,6 @@ class Notification {
 
   Future<void> _requestPermission() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
-
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       announcement: false,
@@ -150,7 +151,6 @@ class Notification {
       provisional: false,
       sound: true,
     );
-
     print('User granted permission: ${settings.authorizationStatus}');
   }
 
@@ -158,100 +158,78 @@ class Notification {
     _token = await FirebaseMessaging.instance.getToken();
   }
 
-  static Future<void> sendToDevice(
-      {String? token, String? body, String? title}) async {
-    _sendMessage(reciever: token, body: body, title: title);
-  }
-
-  static Future<void> sendToChannel(
-      {String? channel, String? title, String? body}) async {
-    _sendMessage(reciever: '/topics/$channel', body: body, title: title);
-  }
-
-  /*static Future<void> _sendMessageV1(
-      {String? reciever,
-      String? body,
-      String? title,
-      required bool isTopic}) async {
-    if (reciever == null) {
-      print('Unable to send FCM message, no token exists.');
-      return;
-    }
-
+  Future<void> subscribeDevice(String uid) async {
+    String body = jsonEncode(<String, dynamic>{
+      "uid": uid,
+      "deviceid": _token,
+    });
+    var digest = hmacSha256.convert(utf8.encode(body));
     try {
-      // print(await FirebaseAuth.instance.currentUser!.getIdToken());
       await http
           .post(
             Uri.parse(
-                'https://fcm.googleapis.com/v1/projects/moj-majstor-a2658/messages:send'),
+                'https://notificationservicebytech.azurewebsites.net/subscribeDevice'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization': 'Bearer ' +
-                  "ya29.A0ARrdaM9yvmjOEEhrpzjWJYlc28WpHZrCGwGvAzpZNMfgUCGGwxUMmDks5dKSiVQ3Mo5JZGgZpOHSzdwPPWkiBv5AyEL3guGny0SIsWz15v50ncclCg7WcbGu7hlwMtboBFSkHxX0nDt6-dACWNoXojMMuR54",
-              //    'eyJhbGciOiJSUzI1NiIsImtpZCI6ImFhZmE4MTJiMTY5NzkxODBmYzc4MjA5ZWE3Y2NhYjkxZTY4NDM2NTkiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiU2FzYSBTdG9qaWxqa292aWMiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EtL0FPaDE0R2dXS0JobGZDVjgxZGEzNW5YS2ZVUGhMQnByR0t1b0xJdktZQVZHMFE9czk2LWMiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbW9qLW1hanN0b3ItYTI2NTgiLCJhdWQiOiJtb2otbWFqc3Rvci1hMjY1OCIsImF1dGhfdGltZSI6MTY1MDI4NjcxNCwidXNlcl9pZCI6ImFGbk53QnZpT1NTbGpyS0YzZHRqcmhpcVF3NDMiLCJzdWIiOiJhRm5Od0J2aU9TU2xqcktGM2R0anJoaXFRdzQzIiwiaWF0IjoxNjUwMjg2NzE0LCJleHAiOjE2NTAyOTAzMTQsImVtYWlsIjoic2dzc2FzYUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJnb29nbGUuY29tIjpbIjEwODM1MDE1MzQ1Nzg3ODUxODYxMyJdLCJlbWFpbCI6WyJzZ3NzYXNhQGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.X4mqu4a6W7Mhha_oc35xsAHaVtd5ZlD63OLICGXp6JkI1dyT24WHMxMmeGU5baJiIWetZayp5jdilslBc-DJq3JhQel9hngdAlAu3MXFkPAizHy_sajTU7WhVzlafoZfyICNsrpF7Y8wOmLSAMn8OHSZa7Dew1W_W3s3HtN3dp679hn10S17LjD9LlUh6f6VjzUzu9YupSLp-jJP8suFlklB',
-              //'ya29.A0ARrdaM-96u5xrnqXjLWwATzWTaGGhuEmWZ6Cg9EPHdNcRSlnCypSWkLdA2FprZSVhHhohMqMNDq-2KsDI_Xp5vqmu_Ck-W7eJBcZi1dq0UNfA8c-nRi0_SfLPL9QzySZzb5jQ9FHGecxOFehXMTmJR9d_h4f',
+              'securetoken': digest.toString(),
             },
-            body: jsonEncode(<String, dynamic>{
-              "message": {
-                "notification": {
-                  "title": " up 1.43% on the day",
-                  "body":
-                      'FooCorp gained 11.80 points to close at 835.67, up 1.43% on the day.'
-                },
-                "android": {
-                  "notification": {
-                    "icon": 'app_icon',
-                    "color": '#7e55c3',
-                    "image":
-                        "https://lh3.googleusercontent.com/ogw/ADea4I5Z-pEWkfhAeASbHku2-CH_sG5H1QWZc36rvtUJ=s64-c-mo",
-                    // "sound": "notification_sound",
-                    //"light_on_duration": "1000",
-                    //"light_off_duration": "1000",
-                  }
-                },
-                isTopic ? "topic" : "to": reciever,
-              }
-            }),
+            body: body,
           )
-          .then((http.Response value) => print(value.body));
+          .then((http.Response value) => print("IZLAZ: " + value.body));
+
       print('FCM request for channel sent!');
     } catch (e) {
       print(e);
     }
-  }*/
+  }
 
-  static Future<void> _sendMessage(
-      {String? reciever, String? body, String? title}) async {
-    if (reciever == null) {
-      print('Unable to send FCM message, no token exists.');
-      return;
-    }
-
+  Future<void> unSubscribeDevice(String uid) async {
+    String body = jsonEncode(<String, dynamic>{
+      "uid": uid,
+      "deviceid": _token,
+    });
+    var digest = hmacSha256.convert(utf8.encode(body));
     try {
       await http
           .post(
-            Uri.parse('https://fcm.googleapis.com/fcm/send'),
+            Uri.parse(
+                'https://notificationservicebytech.azurewebsites.net/unSubscribeDevice'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization':
-                  "key=AAAAMAZg1HQ:APA91bH7zI_5e_aIb2Cx8xUYI_u7rDZVOqxp7KGn2OcWTPkV8yC0ekfRQpX0sR9NMH5jrpMHfIEO3yDKZ8DELOvWva9FSkSEDqgOjk7ovnmUsNEYIqpDwn-rqwgSGO78VnY0vLnFIM2c",
+              'securetoken': digest.toString(),
             },
-            body: jsonEncode(<String, dynamic>{
-              "notification": <String, dynamic>{
-                "icon": "app_icon",
-                "body": body ?? "No message",
-                "title": title ??
-                    "https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
-                "image":
-                    "https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png"
-              },
-              'priority': 'high',
-              // 'click_action': "FLUTTER_NOTIFICATION_CLICK",
-              "data": <String, dynamic>{'id': '1', 'status': 'done'},
-              "to": reciever //ovde se menja na id
-            }),
+            body: body,
           )
-          .then((http.Response value) => print(value.body));
+          .then((http.Response value) => print("IZLAZ: " + value.body));
+
+      print('FCM request for channel sent!');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> sendMessagetoUser(String senderUID, String recieverUID,
+      String title, String message, String image) async {
+    String body = jsonEncode(<String, dynamic>{
+      "sender": senderUID,
+      "reciever": recieverUID,
+      "title": title,
+      "message": message,
+      "image": image
+    });
+    var digest = hmacSha256.convert(utf8.encode(body));
+    try {
+      await http
+          .post(
+            Uri.parse(
+                'https://notificationservicebytech.azurewebsites.net/sendMessageToUser'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'securetoken': digest.toString(),
+            },
+            body: body,
+          )
+          .then((http.Response value) => print("IZLAZ: " + value.body));
 
       print('FCM request for channel sent!');
     } catch (e) {

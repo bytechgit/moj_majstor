@@ -112,9 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               title: const Text('Push Notification'),
-              onTap: () {
-                FCM.Notification.sendToChannel(channel: 'Testing');
-              },
+              onTap: () {},
             ),
           ],
         ),

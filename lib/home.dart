@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:moj_majstor/InternetConnection.dart';
 import 'package:moj_majstor/Login.dart';
 import 'package:moj_majstor/PhoneLogin.dart';
@@ -71,7 +72,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return OverlaySupport.global(
-      child: MaterialApp(
+      child: GetMaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(primarySwatch: Colors.indigo),
         home: Scaffold(

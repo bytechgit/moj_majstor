@@ -90,6 +90,9 @@ class HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
                           onPressed: () {
                             Scaffold.of(context).openEndDrawer();
                             //storeController.updateFollowerCount();
+                            Get.snackbar(
+                                'Updated', 'Store name has been updated ton ',
+                                snackPosition: SnackPosition.BOTTOM);
                           },
                           icon: Icon(
                             Icons.tune,
@@ -110,31 +113,33 @@ class HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
                           child: SizedBox(
                             width: 90,
                             height: 90,
-                            child: Column(
-                              children: [
-                                if (filterController.categoryIcon.value != '')
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Obx(
-                                      () => Image(
-                                        width: 50,
-                                        image: AssetImage(filterController
-                                            .categoryIcon.value),
+                            child: Obx(
+                              () => Column(
+                                children: [
+                                  if (filterController.categoryIcon.value != '')
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Obx(
+                                        () => Image(
+                                          width: 50,
+                                          image: AssetImage(filterController
+                                              .categoryIcon.value),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                Expanded(child: Container()),
-                                if (filterController.category.value != '')
-                                  Padding(
-                                      padding: const EdgeInsets.only(
-                                          bottom: 8.0, left: 5, right: 5),
-                                      child: FittedBox(
-                                        child: Obx(
-                                          () => Text(
-                                              filterController.category.value),
-                                        ),
-                                      ))
-                              ],
+                                  Expanded(child: Container()),
+                                  if (filterController.category.value != '')
+                                    Padding(
+                                        padding: const EdgeInsets.only(
+                                            bottom: 8.0, left: 5, right: 5),
+                                        child: FittedBox(
+                                          child: Obx(
+                                            () => Text(filterController
+                                                .category.value),
+                                          ),
+                                        ))
+                                ],
+                              ),
                             ),
                           ),
                           color: Color.fromARGB(255, 217, 222, 255),
