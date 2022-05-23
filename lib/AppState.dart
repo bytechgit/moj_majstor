@@ -2,10 +2,13 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:moj_majstor/filter.dart';
 import 'package:moj_majstor/models/Majstor.dart';
 
 class AppState with ChangeNotifier {
-  AppState() {}
+  AppState() {
+    ProcitajMajstori();
+  }
   final _firestore = FirebaseFirestore.instance;
   List<MajstorModel> majstori = [];
   DocumentSnapshot<Object?>? lastReadedDoc;
@@ -14,7 +17,7 @@ class AppState with ChangeNotifier {
       final newDocumentList = (await _firestore
           .collection("Users")
           // .orderBy("score")
-          .limit(2)
+          .limit(5)
           .get());
       for (var document in newDocumentList.docs) {
         majstori.add(MajstorModel.fromMap(document.data()));

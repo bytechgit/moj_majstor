@@ -1,21 +1,29 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:moj_majstor/AppState.dart';
+import 'package:moj_majstor/CategoryItem.dart';
+import 'package:moj_majstor/filter.dart';
 import 'package:provider/provider.dart';
+
+import 'getxstate.dart';
 
 class HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
   double toolBarHeight;
   double closedHeight;
   double openHeight;
 
+  final filterController = Get.find<Filter>();
   HomeHeaderDelegate({
     this.toolBarHeight = 0,
     this.closedHeight = 0,
     required this.openHeight,
   });
 
-  @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final appState = Provider.of<AppState>(context);
     return Container(
       height: toolBarHeight + openHeight,
       color: Colors.white,
@@ -57,6 +65,8 @@ class HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
                             ),
                             Expanded(
                               child: TextField(
+                                controller: filterController.searchcontroller,
+                                // storeController.reviewNameController,
                                 style: TextStyle(fontSize: 20),
                                 decoration: new InputDecoration(
                                     border: InputBorder.none,
@@ -79,7 +89,7 @@ class HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
                         child: IconButton(
                           onPressed: () {
                             Scaffold.of(context).openEndDrawer();
-                            print("aaa");
+                            //storeController.updateFollowerCount();
                           },
                           icon: Icon(
                             Icons.tune,
@@ -94,31 +104,42 @@ class HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
                   children: [
                     SingleChildScrollView(
                       physics: const NeverScrollableScrollPhysics(),
-                      child: Card(
-                        child: SizedBox(
-                          width: 90,
-                          height: 90,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Image(
-                                  width: 50,
-                                  image:
-                                      AssetImage('assets/img/kategorija1.png'),
-                                ),
-                              ),
-                              Expanded(child: Container()),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    bottom: 8.0, left: 5, right: 5),
-                                child: FittedBox(child: Text('Moler')),
-                              )
-                            ],
+                      child: InkWell(
+                        onTap: () {},
+                        child: Card(
+                          child: SizedBox(
+                            width: 90,
+                            height: 90,
+                            child: Column(
+                              children: [
+                                if (filterController.categoryIcon.value != '')
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Obx(
+                                      () => Image(
+                                        width: 50,
+                                        image: AssetImage(filterController
+                                            .categoryIcon.value),
+                                      ),
+                                    ),
+                                  ),
+                                Expanded(child: Container()),
+                                if (filterController.category.value != '')
+                                  Padding(
+                                      padding: const EdgeInsets.only(
+                                          bottom: 8.0, left: 5, right: 5),
+                                      child: FittedBox(
+                                        child: Obx(
+                                          () => Text(
+                                              filterController.category.value),
+                                        ),
+                                      ))
+                              ],
+                            ),
                           ),
+                          color: Color.fromARGB(255, 217, 222, 255),
+                          elevation: 4,
                         ),
-                        color: Color.fromARGB(255, 217, 222, 255),
-                        elevation: 4,
                       ),
                     ),
                     Expanded(
@@ -127,135 +148,21 @@ class HomeHeaderDelegate extends SliverPersistentHeaderDelegate {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(children: [
-                            Card(
-                              child: SizedBox(
-                                width: 90,
-                                height: 90,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Image(
-                                        width: 50,
-                                        image: AssetImage(
-                                            'assets/img/kategorija1.png'),
-                                      ),
-                                    ),
-                                    Expanded(child: Container()),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      child: FittedBox(child: Text('Moler')),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              color: Colors.white,
-                              elevation: 3,
+                            CategoryItem(
+                              icon: 'assets/img/kategorija1.png',
+                              category: 'Elektricar',
                             ),
-                            Card(
-                              child: SizedBox(
-                                width: 90,
-                                height: 90,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Image(
-                                        width: 50,
-                                        image: AssetImage(
-                                            'assets/img/kategorija3.png'),
-                                      ),
-                                    ),
-                                    Expanded(child: Container()),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      child: FittedBox(child: Text('Moler')),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              color: Colors.white,
-                              elevation: 3,
+                            CategoryItem(
+                              icon: 'assets/img/kategorija1.png',
+                              category: 'Vodoinstalater',
                             ),
-                            Card(
-                              child: SizedBox(
-                                width: 90,
-                                height: 90,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Image(
-                                        width: 50,
-                                        image: AssetImage(
-                                            'assets/img/kategorija3.png'),
-                                      ),
-                                    ),
-                                    Expanded(child: Container()),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      child: FittedBox(child: Text('Moler')),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              color: Colors.white,
-                              elevation: 3,
+                            CategoryItem(
+                              icon: 'assets/img/kategorija2.png',
+                              category: 'Mehanicar',
                             ),
-                            Card(
-                              child: SizedBox(
-                                width: 90,
-                                height: 90,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Image(
-                                        width: 50,
-                                        image: AssetImage(
-                                            'assets/img/kategorija3.png'),
-                                      ),
-                                    ),
-                                    Expanded(child: Container()),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      child: FittedBox(child: Text('Moler')),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              color: Colors.white,
-                              elevation: 3,
-                            ),
-                            Card(
-                              child: SizedBox(
-                                width: 90,
-                                height: 90,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Image(
-                                        width: 50,
-                                        image: AssetImage(
-                                            'assets/img/kategorija1.png'),
-                                      ),
-                                    ),
-                                    Expanded(child: Container()),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      child: FittedBox(child: Text('Moler')),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              color: Colors.white,
-                              elevation: 3,
+                            CategoryItem(
+                              icon: 'assets/img/kategorija1.png',
+                              category: 'Cistacica',
                             ),
                           ]),
                         ),

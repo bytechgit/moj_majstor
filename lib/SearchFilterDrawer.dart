@@ -1,5 +1,12 @@
+import 'dart:developer';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:moj_majstor/AppState.dart';
+import 'package:provider/provider.dart';
+
+import 'filter.dart';
 
 class FilterDrawer extends StatefulWidget {
   const FilterDrawer({Key? key}) : super(key: key);
@@ -10,8 +17,8 @@ class FilterDrawer extends StatefulWidget {
 
 TextStyle items = TextStyle(fontSize: 16);
 TextStyle heders = TextStyle(fontSize: 18, fontWeight: FontWeight.w600);
-List gradovi = ['Nis', 'Leskovac', 'Krusevac', 'Beograd'];
-String? sortirajpo = 'Popularonst';
+List<String> gradovi = ['Nis', 'Leskovac', 'Krusevac', 'Beograd'];
+final filterController = Get.find<Filter>();
 
 class _FilterDrawerState extends State<FilterDrawer> {
   @override
@@ -51,14 +58,12 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           'Popularnost',
                           style: items,
                         ),
-                        Radio(
-                            value: 'Popularonst',
-                            groupValue: sortirajpo,
-                            onChanged: (String? value) {
-                              setState(() {
-                                sortirajpo = value;
-                              });
-                            }),
+                        Obx(
+                          () => Radio(
+                              value: 'Popularnost',
+                              groupValue: filterController.sortBy.value,
+                              onChanged: filterController.handleSortByChange),
+                        ),
                       ],
                     ),
                     Row(
@@ -68,14 +73,12 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           'Ocena',
                           style: items,
                         ),
-                        Radio(
-                            value: 'Ocena',
-                            groupValue: sortirajpo,
-                            onChanged: (String? value) {
-                              setState(() {
-                                sortirajpo = value;
-                              });
-                            }),
+                        Obx(
+                          () => Radio(
+                              value: 'Ocena',
+                              groupValue: filterController.sortBy.value,
+                              onChanged: (filterController.handleSortByChange)),
+                        ),
                       ],
                     ),
                     Row(
@@ -85,14 +88,12 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           'Recencije',
                           style: items,
                         ),
-                        Radio(
-                            value: 'Ocena1',
-                            groupValue: sortirajpo,
-                            onChanged: (String? value) {
-                              setState(() {
-                                sortirajpo = value;
-                              });
-                            }),
+                        Obx(
+                          () => Radio(
+                              value: 'Recencije',
+                              groupValue: filterController.sortBy.value,
+                              onChanged: filterController.handleSortByChange),
+                        ),
                       ],
                     ),
                   ],
@@ -108,10 +109,11 @@ class _FilterDrawerState extends State<FilterDrawer> {
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                 child: SizedBox(
-                  child: DropdownSearch(
+                  child: DropdownSearch<String>(
                     // dropdownSearchDecoration: InputDecoration(
                     //labelText: "Menu mode",
                     //  ),
+                    selectedItem: filterController.city,
                     dropdownSearchDecoration: InputDecoration(
                       labelText: "Odaberi grad",
                       border: OutlineInputBorder(
@@ -120,6 +122,9 @@ class _FilterDrawerState extends State<FilterDrawer> {
                     ),
                     items: gradovi,
                     showSearchBox: true,
+                    onChanged: (value) {
+                      filterController.city = value;
+                    },
                   ),
                 ),
               )
@@ -137,7 +142,9 @@ class _FilterDrawerState extends State<FilterDrawer> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10, right: 4),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     child: Text(
                       'Gotovo',
                       style: TextStyle(),
@@ -153,7 +160,11 @@ class _FilterDrawerState extends State<FilterDrawer> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 4, right: 10),
                   child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pop(context);
+                        filterController.city = null;
+                        // filterController.sortBy.value = 'Popularnost';
+                      },
                       child: Text('Resetuj'),
                       style: ButtonStyle(
                         side: MaterialStateProperty.all(const BorderSide(

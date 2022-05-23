@@ -1,9 +1,14 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:moj_majstor/AppState.dart';
 import 'package:moj_majstor/Majsor.dart';
 import 'package:moj_majstor/SearchFilterDrawer.dart';
+import 'package:moj_majstor/ShimmerList.dart';
+import 'package:moj_majstor/filter.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
+import 'getxstate.dart';
 import 'homeHeaderDelegate.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -29,6 +34,8 @@ class _probaState extends State<proba> {
   ScrollController _scrollController = ScrollController();
   void initState() {
     super.initState();
+    final storeController = Get.put(Filter());
+    // Provider.of<AppState>(context, listen: false).ProcitajMajstori();
   }
 
   bool p = true;
@@ -81,14 +88,18 @@ class _probaState extends State<proba> {
                 ),
                 Consumer<AppState>(builder: (context, appstate, child) {
                   return SliverToBoxAdapter(
-                    child: Column(
-                      //for (int i = 0; i < 100; i++)
+                    child: SizedBox(
+                      child: Column(
+                        //for (int i = 0; i < 100; i++)
 
-                      children: appstate.majstori.map((e) {
-                        return Majstor(
-                          majstor: e,
-                        );
-                      }).toList(),
+                        children: appstate.majstori.isNotEmpty
+                            ? (appstate.majstori.map((e) {
+                                return Majstor(
+                                  majstor: e,
+                                );
+                              }).toList())
+                            : [ShimmerList()],
+                      ),
                     ),
                   );
                 }),
